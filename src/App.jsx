@@ -15,7 +15,7 @@ export default function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const touchStartX = useRef(null);
   
-  const APP_VERSION = 'v10';
+  const APP_VERSION = 'v11';
   const [showUpdateToast, setShowUpdateToast] = useState(false);
 
   useEffect(() => {
