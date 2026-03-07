@@ -183,11 +183,13 @@ export default function ShareTimetable({ onClose }) {
   const handleConfirmRestore = () => {
     if (!pendingBackupData) return;
     
-    if (pendingBackupData.timetable) storage.saveTimetable(pendingBackupData.timetable);
-    if (pendingBackupData.holidays) storage.saveHolidays(pendingBackupData.holidays);
-    if (pendingBackupData.records) storage.saveRecords(pendingBackupData.records);
-    if (pendingBackupData.baseCounts) storage.saveBaseCounts(pendingBackupData.baseCounts);
-    if (pendingBackupData.startDate) storage.saveStartDate(pendingBackupData.startDate);
+    // Bypass React state-helpers and storage wrapper entirely to avoid unmount race conditions
+    // Hardwrite into localStorage directly before the location.reload happens
+    if (pendingBackupData.timetable) localStorage.setItem('attendance_timetable', JSON.stringify(pendingBackupData.timetable));
+    if (pendingBackupData.holidays) localStorage.setItem('attendance_holidays', JSON.stringify(pendingBackupData.holidays));
+    if (pendingBackupData.records) localStorage.setItem('attendance_records', JSON.stringify(pendingBackupData.records));
+    if (pendingBackupData.baseCounts) localStorage.setItem('attendance_base_counts', JSON.stringify(pendingBackupData.baseCounts));
+    if (pendingBackupData.startDate) localStorage.setItem('semester_start_date', JSON.stringify(pendingBackupData.startDate));
     
     alert("Full Backup imported successfully! The app will now reload.");
     window.location.reload();

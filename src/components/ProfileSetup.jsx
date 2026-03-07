@@ -69,10 +69,10 @@ export default function ProfileSetup({ onComplete }) {
         }
         
         if (importedTt.length > 0) {
-            storage.saveTimetable(importedTt);
+            localStorage.setItem('attendance_timetable', JSON.stringify(importedTt));
         }
         if (importedHolidays.length > 0) {
-            storage.saveHolidays(importedHolidays);
+            localStorage.setItem('attendance_holidays', JSON.stringify(importedHolidays));
         }
         if (isFullBackup) {
             const recordsToSave = data.records || (data.ar ? data.ar.map(r => ({
@@ -82,12 +82,13 @@ export default function ProfileSetup({ onComplete }) {
               status: r.st || r.status
             })) : null);
             
-            if (recordsToSave) storage.saveRecords(recordsToSave);
-            if (data.baseCounts || data.bc) storage.saveBaseCounts(data.baseCounts || data.bc);
-            if (data.startDate || data.sd) storage.saveStartDate(data.startDate || data.sd);
+            if (recordsToSave) localStorage.setItem('attendance_records', JSON.stringify(recordsToSave));
+            if (data.baseCounts || data.bc) localStorage.setItem('attendance_base_counts', JSON.stringify(data.baseCounts || data.bc));
+            if (data.startDate || data.sd) localStorage.setItem('semester_start_date', JSON.stringify(data.startDate || data.sd));
             
             // Full backup means we already have baseline counts, skip CatchupWizard
-            onComplete();
+            // and forcefully reload to safely hydrate the entire app state
+            window.location.reload();
             return;
         }
       }
