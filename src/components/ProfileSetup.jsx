@@ -76,14 +76,26 @@ export default function ProfileSetup({ onComplete }) {
         }
         if (isFullBackup) {
             const recordsToSave = data.records || (data.ar ? data.ar.map(r => ({
-              date: r.d || r.date,
+              date: r.d || r.dt || r.date,
               hour: r.h || r.hour,
               subject: r.s || r.subject,
               status: r.st || r.status
             })) : null);
             
             if (recordsToSave) localStorage.setItem('attendance_records', JSON.stringify(recordsToSave));
-            if (data.baseCounts || data.bc) localStorage.setItem('attendance_base_counts', JSON.stringify(data.baseCounts || data.bc));
+            
+            let rawCounts = data.baseCounts || data.bc;
+            if (rawCounts) {
+                const normalizedCounts = {};
+                Object.keys(rawCounts).forEach(s => {
+                   normalizedCounts[s] = {
+                       attended: rawCounts[s].attended ?? rawCounts[s].baseAttended ?? 0,
+                       total: rawCounts[s].total ?? rawCounts[s].baseTotal ?? 0
+                   };
+                });
+                localStorage.setItem('attendance_base_counts', JSON.stringify(normalizedCounts));
+            }
+            
             if (data.startDate || data.sd) localStorage.setItem('semester_start_date', JSON.stringify(data.startDate || data.sd));
             
             // Full backup means we already have baseline counts, skip CatchupWizard

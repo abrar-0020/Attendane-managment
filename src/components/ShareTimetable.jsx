@@ -146,7 +146,7 @@ export default function ShareTimetable({ onClose }) {
          if (data.ar || data.records) {
             let rSrc = data.ar || data.records;
             importedData.records = rSrc.map(r => ({
-              date: r.d || r.date,
+              date: r.d || r.dt || r.date,
               hour: r.h || r.hour,
               subject: r.s || r.subject,
               status: r.st || r.status
@@ -154,7 +154,18 @@ export default function ShareTimetable({ onClose }) {
          }
          
          if (data.sd) importedData.startDate = data.sd;
-         if (data.bc) importedData.baseCounts = data.bc;
+         
+         if (data.bc || data.baseCounts) {
+            let rawCounts = data.bc || data.baseCounts;
+            const normalizedCounts = {};
+            Object.keys(rawCounts).forEach(s => {
+               normalizedCounts[s] = {
+                   attended: rawCounts[s].attended ?? rawCounts[s].baseAttended ?? 0,
+                   total: rawCounts[s].total ?? rawCounts[s].baseTotal ?? 0
+               };
+            });
+            importedData.baseCounts = normalizedCounts;
+         }
 
       } else {
          throw new Error("Invalid format");
