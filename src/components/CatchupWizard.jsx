@@ -15,17 +15,20 @@ export default function CatchupWizard({ onComplete }) {
     // Initialize default counts
     const initial = {};
     uniqueSubjects.forEach(s => {
-      initial[s] = { attended: 0, total: 0 };
+      initial[s] = { attended: '', total: '' };
     });
     setCounts(initial);
   }, []);
 
   const handleUpdate = (subject, field, value) => {
-    const num = Math.max(0, parseInt(value) || 0);
+    let num = value === '' ? '' : parseInt(value, 10);
+    if (Number.isNaN(num)) num = '';
+    else num = Math.max(0, num);
+
     setCounts(prev => {
       const updated = { ...prev, [subject]: { ...prev[subject], [field]: num } };
       // Ensure attended doesn't exceed total realistically, but allowing it for flexibility
-      if (field === 'total' && updated[subject].attended > num) {
+      if (field === 'total' && updated[subject].attended !== '' && num !== '' && updated[subject].attended > num) {
         updated[subject].attended = num;
       }
       return updated;
@@ -33,7 +36,14 @@ export default function CatchupWizard({ onComplete }) {
   };
 
   const submit = () => {
-    onComplete(counts);
+    const finalCounts = {};
+    Object.keys(counts).forEach(s => {
+      finalCounts[s] = {
+        attended: counts[s].attended === '' ? 0 : counts[s].attended,
+        total: counts[s].total === '' ? 0 : counts[s].total
+      };
+    });
+    onComplete(finalCounts);
   };
 
   return (
@@ -57,6 +67,7 @@ export default function CatchupWizard({ onComplete }) {
                   value={counts[sub].attended} 
                   onChange={e => handleUpdate(sub, 'attended', e.target.value)} 
                   title="Classes Attended"
+                  placeholder="0"
                 />
                 <span>/</span>
                 <input 
@@ -65,6 +76,7 @@ export default function CatchupWizard({ onComplete }) {
                   value={counts[sub].total} 
                   onChange={e => handleUpdate(sub, 'total', e.target.value)} 
                   title="Total Classes Held"
+                  placeholder="0"
                 />
               </div>
             </div>
