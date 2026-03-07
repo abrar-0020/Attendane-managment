@@ -12,6 +12,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(0); // 0: Timetable, 1: Summary, 2: Settings
   const [slideDir, setSlideDir] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
   const touchStartX = useRef(null);
   
   const APP_VERSION = 'v10';
@@ -26,8 +27,27 @@ export default function App() {
         setAppState('setup');
       }
     }, 1800);
-    return () => clearTimeout(timer);
+
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   const checkUpdateNotif = () => {
     const notified = storage.getNotifiedVersion();
@@ -96,6 +116,13 @@ export default function App() {
         <div className="update-toast">
           <span>📲 Press home button now to get notification!</span>
           <button onClick={() => setShowUpdateToast(false)}>✕</button>
+        </div>
+      )}
+
+      {deferredPrompt && (
+        <div className="update-toast" style={{ top: showUpdateToast ? '70px' : '16px', background: 'var(--success)', zIndex: 1999 }}>
+          <span>Install Attendit to your Home Screen</span>
+          <button style={{ background: 'white', color: 'var(--success)', fontWeight: 'bold' }} onClick={handleInstallClick}>Install</button>
         </div>
       )}
 
