@@ -1,0 +1,87 @@
+.date-selector-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 16px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.date-selector-container::-webkit-scrollbar {
+  display: none;
+}
+
+.date-chip {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 84px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #64748b;
+  cursor: pointer;
+  scroll-snap-align: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.date-chip:active {
+  transform: scale(0.95);
+}
+
+.date-chip .day-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.date-chip .date-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 4px 0;
+}
+
+.date-chip .month-name {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.date-chip.today {
+  color: var(--primary);
+}
+
+.date-chip.today .date-num {
+  color: var(--primary);
+}
+
+.today-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  position: absolute;
+  bottom: 6px;
+}
+
+.date-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 8px 16px rgba(244, 63, 94, 0.3);
+  transform: translateY(-4px);
+}
+
+.date-chip.active .date-num, .date-chip.active .day-name, .date-chip.active .month-name {
+  color: white;
+}
+
+.date-chip.active .today-dot {
+  background: white;
+}

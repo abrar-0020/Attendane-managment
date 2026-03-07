@@ -1,0 +1,88 @@
+.timetable-view {
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header-section {
+  padding: 0 24px;
+  margin-bottom: 8px;
+}
+
+.greeting {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+.selector-wrapper {
+  margin-bottom: 12px;
+}
+
+.classes-container {
+  flex: 1;
+  padding: 8px 8px 24px 8px;
+}
+
+.holiday-banner {
+  background: linear-gradient(135deg, #ffe4e6 0%, #fda4af 100%);
+  border-radius: 20px;
+  padding: 24px;
+  margin: 16px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(244, 114, 182, 0.2);
+  color: #be185d;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.holiday-banner h3 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.holiday-banner p {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: #64748b;
+  animation: fadeIn 0.4s ease;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  opacity: 0.8;
+}
+
+.empty-state p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

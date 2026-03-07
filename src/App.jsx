@@ -1,0 +1,124 @@
+import { useState, useEffect, useRef } from 'react';
+import { storage } from './services/storage';
+import SplashScreen from './components/SplashScreen';
+import ProfileSetup from './components/ProfileSetup';
+import TimetableView from './components/TimetableView';
+import SummaryView from './components/SummaryView';
+import TimetableEditor from './components/TimetableEditor';
+import './App.css';
+
+export default function App() {
+  const [appState, setAppState] = useState('splash'); // splash, setup, main
+  const [activeTab, setActiveTab] = useState(0); // 0: Timetable, 1: Summary, 2: Settings
+  const [slideDir, setSlideDir] = useState('');
+  const [isAnimating, setIsAnimating] = useState(false);
+  const touchStartX = useRef(null);
+  
+  const APP_VERSION = 'v10';
+  const [showUpdateToast, setShowUpdateToast] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (storage.hasProfile()) {
+        setAppState('main');
+        checkUpdateNotif();
+      } else {
+        setAppState('setup');
+      }
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const checkUpdateNotif = () => {
+    const notified = storage.getNotifiedVersion();
+    if (notified !== APP_VERSION) {
+      setShowUpdateToast(true);
+      setTimeout(() => setShowUpdateToast(false), 15000);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      storage.saveNotifiedVersion(APP_VERSION);
+    }
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.hidden) {
+      if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification('Attendit updated!', {
+            body: 'Run in background capabilities attached.',
+            requireInteraction: true
+          });
+        });
+      }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+  };
+
+  const navigateTab = (newTab) => {
+    if (isAnimating || newTab === activeTab) return;
+    if (newTab < 0 || newTab > 2) return;
+    
+    setSlideDir(newTab > activeTab ? 'slide-in-right' : 'slide-in-left');
+    setActiveTab(newTab);
+    setIsAnimating(true);
+    window.scrollTo(0, 0);
+    setTimeout(() => setIsAnimating(false), 320);
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.target.closest('.date-selector-container')) return;
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+    
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) navigateTab(activeTab + 1); // swipe left = next
+      else navigateTab(activeTab - 1); // swipe right = prev
+    }
+    touchStartX.current = null;
+  };
+
+  if (appState === 'splash') {
+    return <SplashScreen />;
+  }
+
+  if (appState === 'setup') {
+    return <ProfileSetup onComplete={() => setAppState('main')} />;
+  }
+
+  return (
+    <div className="app-container" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      
+      {showUpdateToast && (
+        <div className="update-toast">
+          <span>📲 Press home button now to get notification!</span>
+          <button onClick={() => setShowUpdateToast(false)}>✕</button>
+        </div>
+      )}
+
+      <div className={`main-content ${isAnimating ? `page-transition-enter ${slideDir}` : ''}`}>
+        {activeTab === 0 && <TimetableView />}
+        {activeTab === 1 && <SummaryView />}
+        {activeTab === 2 && <TimetableEditor />}
+      </div>
+
+      <nav className="bottom-nav">
+        <button className={`nav-item ${activeTab === 0 ? 'active' : ''}`} onClick={() => navigateTab(0)}>
+          <span className="nav-icon">🗓️</span>
+          <span>Timetable</span>
+        </button>
+        <button className={`nav-item ${activeTab === 1 ? 'active' : ''}`} onClick={() => navigateTab(1)}>
+           <span className="nav-icon">📊</span>
+          <span>Summary</span>
+        </button>
+        <button className={`nav-item ${activeTab === 2 ? 'active' : ''}`} onClick={() => navigateTab(2)}>
+           <span className="nav-icon">⚙️</span>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </div>
+  );
+}
