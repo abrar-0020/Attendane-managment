@@ -63,7 +63,7 @@ export default function App() {
     if (document.hidden) {
       if ('serviceWorker' in navigator && Notification.permission === 'granted') {
         navigator.serviceWorker.ready.then(reg => {
-          reg.showNotification('Attendit updated!', {
+          reg.showNotification('Attendknow updated!', {
             body: 'Run in background capabilities attached.',
             requireInteraction: true
           });
@@ -121,7 +121,7 @@ export default function App() {
 
       {deferredPrompt && (
         <div className="update-toast" style={{ top: showUpdateToast ? '70px' : '16px', background: 'var(--success)', zIndex: 1999 }}>
-          <span>Install Attendit to your Home Screen</span>
+          <span>Install Attendknow to your Home Screen</span>
           <button style={{ background: 'white', color: 'var(--success)', fontWeight: 'bold' }} onClick={handleInstallClick}>Install</button>
         </div>
       )}
