@@ -26,11 +26,20 @@ export default function ShareTimetable({ onClose }) {
 
   const generateBackupCode = () => {
     const data = {
-      timetable: storage.getTimetable(),
-      holidays: storage.getHolidays(),
-      records: storage.getRecords(),
-      baseCounts: storage.getBaseCounts(),
-      startDate: storage.getStartDate()
+      v: 1,
+      tt: storage.getTimetable().map(t => ({
+         d: (t.day || '').substring(0,3),
+         h: t.hour,
+         s: t.starttime,
+         e: t.endtime,
+         c: t.subject,
+         r: t.room || '',
+         sd: t.startDate || ''
+      })),
+      hd: storage.getHolidays().map(h => ({ d: h.date, n: h.name })),
+      ar: storage.getRecords().map(r => ({ d: r.date, h: r.hour, s: r.subject, st: r.status })),
+      sd: storage.getStartDate(),
+      bc: storage.getBaseCounts()
     };
     const jsonStr = JSON.stringify(data);
     const compressed = LZString.compressToBase64(jsonStr);
@@ -98,16 +107,20 @@ export default function ShareTimetable({ onClose }) {
       }
       
       const data = JSON.parse(jsonStr);
-      let importedTt = [];
-      let importedHolidays = [];
+      let importedData = {
+          timetable: [],
+          holidays: [],
+          records: null,
+          baseCounts: null,
+          startDate: null
+      };
       
       if (Array.isArray(data)) {
-         importedTt = data;
+         importedData.timetable = data;
       } else if (data.timetable) {
-         importedTt = data.timetable;
-         if (data.holidays) importedHolidays = data.holidays;
+         importedData = { ...importedData, ...data };
       } else if (data.tt) {
-         importedTt = data.tt.map(t => ({
+         importedData.timetable = data.tt.map(t => ({
            day: t.d === 'Mon' ? 'Monday' : 
                 t.d === 'Tue' ? 'Tuesday' :
                 t.d === 'Wed' ? 'Wednesday' :
@@ -121,27 +134,43 @@ export default function ShareTimetable({ onClose }) {
            room: t.r || '',
            startDate: t.sd || ''
          }));
-         if (data.holidays) {
-            importedHolidays = data.holidays.map(h => ({
-              date: h.d,
-              name: h.n
+         
+         if (data.hd || data.holidays) {
+            let hSrc = data.hd || data.holidays;
+            importedData.holidays = hSrc.map(h => ({
+              date: h.d || h.date,
+              name: h.n || h.name
             }));
          }
+         
+         if (data.ar || data.records) {
+            let rSrc = data.ar || data.records;
+            importedData.records = rSrc.map(r => ({
+              date: r.d || r.date,
+              hour: r.h || r.hour,
+              subject: r.s || r.subject,
+              status: r.st || r.status
+            }));
+         }
+         
+         if (data.sd) importedData.startDate = data.sd;
+         if (data.bc) importedData.baseCounts = data.bc;
+
       } else {
          throw new Error("Invalid format");
       }
       
       if (isFullBackup) {
-          setPendingBackupData(data);
+          setPendingBackupData(importedData);
           setMode('confirm-backup');
           return;
       }
       
-      if (importedTt.length > 0) {
-          storage.saveTimetable(importedTt);
+      if (importedData.timetable.length > 0) {
+          storage.saveTimetable(importedData.timetable);
       }
-      if (importedHolidays.length > 0) {
-          storage.saveHolidays(importedHolidays);
+      if (importedData.holidays.length > 0) {
+          storage.saveHolidays(importedData.holidays);
       }
       
       alert("Timetable imported successfully!");

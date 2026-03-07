@@ -75,9 +75,17 @@ export default function ProfileSetup({ onComplete }) {
             storage.saveHolidays(importedHolidays);
         }
         if (isFullBackup) {
-            if (data.records) storage.saveRecords(data.records);
-            if (data.baseCounts) storage.saveBaseCounts(data.baseCounts);
-            if (data.startDate) storage.saveStartDate(data.startDate);
+            const recordsToSave = data.records || (data.ar ? data.ar.map(r => ({
+              date: r.d || r.date,
+              hour: r.h || r.hour,
+              subject: r.s || r.subject,
+              status: r.st || r.status
+            })) : null);
+            
+            if (recordsToSave) storage.saveRecords(recordsToSave);
+            if (data.baseCounts || data.bc) storage.saveBaseCounts(data.baseCounts || data.bc);
+            if (data.startDate || data.sd) storage.saveStartDate(data.startDate || data.sd);
+            
             // Full backup means we already have baseline counts, skip CatchupWizard
             onComplete();
             return;
