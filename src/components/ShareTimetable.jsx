@@ -35,15 +35,21 @@ export default function ShareTimetable({ onClose }) {
   };
 
   const handleGenerate = async (isBackup = false) => {
+    if (isBackup) {
+      setMode('backup-text');
+      setPasteText(generateBackupCode());
+      return;
+    }
+    
     setMode('generate');
-    setPasteText(isBackup ? 'backup' : 'share'); // Reusing pasteText state temporarily to track mode for the copy button
+    setPasteText('share');
     try {
-      const text = isBackup ? generateBackupCode() : generateShareCode();
+      const text = generateShareCode();
       const url = await QRCode.toDataURL(text, { width: 300, margin: 2, color: { dark: '#1e293b', light: '#ffffff' } });
       setQrSrc(url);
     } catch (e) {
       console.error(e);
-      alert('Failed to generate QR');
+      alert('Failed to generate QR. Your timetable might be too large.');
     }
   };
 
@@ -187,10 +193,28 @@ export default function ShareTimetable({ onClose }) {
             <h3>Scan this Code</h3>
             {qrSrc ? <img src={qrSrc} alt="QR Code" /> : <p>Generating...</p>}
             <button className="copy-btn" onClick={() => {
-              const code = qrSrc && qrSrc.length > 50 ? (pasteText === 'backup' ? generateBackupCode() : generateShareCode()) : generateShareCode();
-              navigator.clipboard.writeText(code);
+              navigator.clipboard.writeText(generateShareCode());
               alert('Copied text code to clipboard!');
             }}>Copy Text Version</button>
+          </div>
+        )}
+
+        {mode === 'backup-text' && (
+          <div className="paste-container add-form" style={{textAlign: 'center'}}>
+            <h3>Full Backup Generated</h3>
+            <p className="subtitle" style={{marginBottom: '16px'}}>This backup is too large for a QR code. Please copy the text below and keep it somewhere safe.</p>
+            <div className="form-group">
+              <textarea 
+                rows={6}
+                readOnly
+                style={{width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc'}}
+                value={pasteText} 
+              />
+            </div>
+            <button className="save-btn" style={{width: '100%', marginTop: '12px'}} onClick={() => {
+              navigator.clipboard.writeText(pasteText);
+              alert('Backup code copied to clipboard!');
+            }}>Copy Backup Code</button>
           </div>
         )}
 
