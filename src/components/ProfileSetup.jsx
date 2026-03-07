@@ -24,8 +24,11 @@ export default function ProfileSetup({ onComplete }) {
       if (importText.trim()) {
         let text = importText.trim();
         let jsonStr = text;
+        let isAD1 = text.startsWith('AD1:');
+        let isTT4 = text.startsWith('TT4:');
+        let isFullBackup = isAD1 || isTT4;
         
-        if (text.startsWith('TT3:') || text.startsWith('TT2:') || text.startsWith('TT1:')) {
+        if (isFullBackup || text.startsWith('TT3:') || text.startsWith('TT2:') || text.startsWith('TT1:')) {
             jsonStr = LZString.decompressFromBase64(text.substring(4));
             if (!jsonStr) {
                // Try URI decoding fallback in case it was modified in transit
@@ -70,6 +73,14 @@ export default function ProfileSetup({ onComplete }) {
         }
         if (importedHolidays.length > 0) {
             storage.saveHolidays(importedHolidays);
+        }
+        if (isFullBackup) {
+            if (data.records) storage.saveRecords(data.records);
+            if (data.baseCounts) storage.saveBaseCounts(data.baseCounts);
+            if (data.startDate) storage.saveStartDate(data.startDate);
+            // Full backup means we already have baseline counts, skip CatchupWizard
+            onComplete();
+            return;
         }
       }
       setStep(3);
