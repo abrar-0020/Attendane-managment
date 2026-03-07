@@ -1,8 +1,8 @@
 {
-  "name": "Attendit",
-  "short_name": "Attendit",
-  "theme_color": "#6366f1",
-  "background_color": "#ede9fe",
+  "name": "Attendknow",
+  "short_name": "Attendknow",
+  "theme_color": "#f43f5e",
+  "background_color": "#ffe4e6",
   "display": "standalone",
   "start_url": "/",
   "orientation": "portrait",
