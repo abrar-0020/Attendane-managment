@@ -5,6 +5,7 @@ import ProfileSetup from './components/ProfileSetup';
 import TimetableView from './components/TimetableView';
 import SummaryView from './components/SummaryView';
 import TimetableEditor from './components/TimetableEditor';
+import ShareTimetable from './components/ShareTimetable';
 import './App.css';
 
 export default function App() {
@@ -13,12 +14,20 @@ export default function App() {
   const [slideDir, setSlideDir] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [sharedCode, setSharedCode] = useState(null);
   const touchStartX = useRef(null);
   
   const APP_VERSION = 'v11';
   const [showUpdateToast, setShowUpdateToast] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareQuery = params.get('share');
+    if (shareQuery) {
+      setSharedCode(shareQuery);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+
     const timer = setTimeout(() => {
       if (storage.hasProfile()) {
         setAppState('main');
@@ -102,11 +111,21 @@ export default function App() {
   };
 
   if (appState === 'splash') {
-    return <SplashScreen />;
+    return (
+      <>
+        <SplashScreen />
+        {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={() => setSharedCode(null)} />}
+      </>
+    );
   }
 
   if (appState === 'setup') {
-    return <ProfileSetup onComplete={() => setAppState('main')} />;
+    return (
+      <>
+        <ProfileSetup onComplete={() => setAppState('main')} />
+        {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={() => setSharedCode(null)} />}
+      </>
+    );
   }
 
   return (
@@ -146,6 +165,7 @@ export default function App() {
           <span>Settings</span>
         </button>
       </nav>
+      {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={() => setSharedCode(null)} />}
     </div>
   );
 }

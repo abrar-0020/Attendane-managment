@@ -1,16 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import QRCode from 'qrcode';
-import { Html5QrcodeScanner } from 'html5-qrcode';
 import LZString from 'lz-string';
 import { storage } from '../services/storage';
 import './ShareTimetable.css';
 
-export default function ShareTimetable({ onClose }) {
-  const [mode, setMode] = useState('menu'); // menu, generate, scan, paste
-  const [qrSrc, setQrSrc] = useState('');
+export default function ShareTimetable({ onClose, initialImportCode }) {
+  const [mode, setMode] = useState('menu'); // menu, share-tt, share-backup, paste
   const [pasteText, setPasteText] = useState('');
-  const scannerRef = useRef(null);
 
   const generateShareCode = () => {
     const data = {
@@ -19,7 +15,8 @@ export default function ShareTimetable({ onClose }) {
     };
     const jsonStr = JSON.stringify(data);
     const compressed = LZString.compressToBase64(jsonStr);
-    return `TT3:${compressed}`;
+    const code = `TT3:${compressed}`;
+    return `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(code)}`;
   };
 
   const [pendingBackupData, setPendingBackupData] = useState(null);
@@ -43,50 +40,29 @@ export default function ShareTimetable({ onClose }) {
     };
     const jsonStr = JSON.stringify(data);
     const compressed = LZString.compressToBase64(jsonStr);
-    return `AD1:${compressed}`;
+    const code = `AD1:${compressed}`;
+    return `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(code)}`;
   };
 
-  const handleGenerate = async (isBackup = false) => {
+  const handleGenerate = (isBackup = false) => {
     if (isBackup) {
-      setMode('backup-text');
+      setMode('share-backup');
       setPasteText(generateBackupCode());
       return;
     }
     
-    setMode('generate');
-    setPasteText('share');
-    try {
-      const text = generateShareCode();
-      const url = await QRCode.toDataURL(text, { width: 300, margin: 2, color: { dark: '#1e293b', light: '#ffffff' } });
-      setQrSrc(url);
-    } catch (e) {
-      console.error(e);
-      alert('Failed to generate QR. Your timetable might be too large.');
-    }
-  };
-
-  const handleScanInit = () => {
-    setMode('scan');
+    setMode('share-tt');
+    setPasteText(generateShareCode());
   };
 
   useEffect(() => {
-    if (mode === 'scan') {
-      scannerRef.current = new Html5QrcodeScanner("reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
-      scannerRef.current.render(onScanSuccess, onScanFailure);
+    if (initialImportCode) {
+      const timer = setTimeout(() => {
+        processImport(initialImportCode);
+      }, 100);
+      return () => clearTimeout(timer);
     }
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(e => console.error(e));
-      }
-    };
-  }, [mode]);
-
-  const onScanSuccess = (decodedText) => {
-    if (scannerRef.current) scannerRef.current.clear();
-    processImport(decodedText);
-  };
-
-  const onScanFailure = () => {};
+  }, [initialImportCode]);
 
   const handlePasteSubmit = () => {
     processImport(pasteText);
@@ -95,14 +71,26 @@ export default function ShareTimetable({ onClose }) {
   const processImport = (text) => {
     try {
       let jsonStr = text.trim();
-      let isTT4 = text.startsWith('TT4:');
-      let isAD1 = text.startsWith('AD1:');
+      
+      try {
+        const urlObj = new URL(jsonStr);
+        const shareParam = urlObj.searchParams.get('share');
+        if (shareParam) {
+          jsonStr = shareParam.trim();
+        }
+      } catch (e) {
+        // Not a URL, proceed normally
+      }
+      
+      let isTT4 = jsonStr.startsWith('TT4:');
+      let isAD1 = jsonStr.startsWith('AD1:');
       let isFullBackup = isTT4 || isAD1;
       
-      if (isFullBackup || text.startsWith('TT3:') || text.startsWith('TT2:') || text.startsWith('TT1:')) {
-        jsonStr = LZString.decompressFromBase64(text.substring(4));
+      if (isFullBackup || jsonStr.startsWith('TT3:') || jsonStr.startsWith('TT2:') || jsonStr.startsWith('TT1:')) {
+        let compressed = jsonStr.substring(4);
+        jsonStr = LZString.decompressFromBase64(compressed);
         if (!jsonStr) {
-           jsonStr = LZString.decompressFromEncodedURIComponent(text.substring(4));
+           jsonStr = LZString.decompressFromEncodedURIComponent(compressed);
         }
       }
       
@@ -228,75 +216,69 @@ export default function ShareTimetable({ onClose }) {
               <div className="icon">💾</div>
               <div style={{textAlign: 'left'}}>
                 <strong>My Data Backup</strong>
-                <div className="card-hint" style={{margin:0}}>Export timetable + full attendance</div>
-              </div>
-            </button>
-            
-            <button className="menu-btn" onClick={handleScanInit}>
-              <div className="icon">📷</div>
-              <div style={{textAlign: 'left'}}>
-                <strong>Scan QR</strong>
-                <div className="card-hint" style={{margin:0}}>Scan a friend's code</div>
+                <div className="card-hint" style={{margin:0}}>Export full attendance</div>
               </div>
             </button>
             
             <button className="menu-btn" onClick={() => setMode('paste')}>
               <div className="icon">📋</div>
               <div style={{textAlign: 'left'}}>
-                <strong>Paste Text</strong>
-                <div className="card-hint" style={{margin:0}}>Import via text snippet</div>
+                <strong>Paste Link</strong>
+                <div className="card-hint" style={{margin:0}}>Import TT3 or AD1 link</div>
               </div>
             </button>
           </div>
         )}
         
-        {mode === 'generate' && (
-          <div className="qr-display">
-            <h3>Scan this Code</h3>
-            {qrSrc ? <img src={qrSrc} alt="QR Code" /> : <p>Generating...</p>}
-            <button className="copy-btn" onClick={() => {
-              navigator.clipboard.writeText(generateShareCode());
-              alert('Copied text code to clipboard!');
-            }}>Copy Text Version</button>
-          </div>
-        )}
-
-        {mode === 'backup-text' && (
+        {mode === 'share-tt' && (
           <div className="paste-container add-form" style={{textAlign: 'center'}}>
-            <h3>Full Backup Generated</h3>
-            <p className="subtitle" style={{marginBottom: '16px'}}>This backup is too large for a QR code. Please copy the text below and keep it somewhere safe.</p>
+            <h3>Your Timetable Link</h3>
+            <p className="subtitle" style={{marginBottom: '16px'}}>Copy the link below to share your schedule.</p>
             <div className="form-group">
               <textarea 
                 rows={6}
                 readOnly
-                style={{width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc'}}
+                style={{width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc', wordBreak: 'break-all'}}
                 value={pasteText} 
               />
             </div>
             <button className="save-btn" style={{width: '100%', marginTop: '12px'}} onClick={() => {
               navigator.clipboard.writeText(pasteText);
-              alert('Backup code copied to clipboard!');
-            }}>Copy Backup Code</button>
+              alert('Copied TT3 Link to clipboard!');
+            }}>Copy Link</button>
           </div>
         )}
 
-        {mode === 'scan' && (
-          <div className="scanner-container">
-            <h3>Scan QR Code</h3>
-            <div id="reader" width="100%"></div>
+        {mode === 'share-backup' && (
+          <div className="paste-container add-form" style={{textAlign: 'center'}}>
+            <h3>Your Data Backup Link</h3>
+            <p className="subtitle" style={{marginBottom: '16px'}}>This backup is too large for a QR code. Please copy the link below and keep it safe.</p>
+            <div className="form-group">
+              <textarea 
+                rows={6}
+                readOnly
+                style={{width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc', wordBreak: 'break-all'}}
+                value={pasteText} 
+              />
+            </div>
+            <button className="save-btn" style={{width: '100%', marginTop: '12px'}} onClick={() => {
+              navigator.clipboard.writeText(pasteText);
+              alert('Copied AD1 Backup Link to clipboard!');
+            }}>Copy Link</button>
           </div>
         )}
 
         {mode === 'paste' && (
           <div className="paste-container add-form">
-            <h3>Paste Code</h3>
+            <h3>Paste Link</h3>
+            <p className="subtitle" style={{marginBottom: '16px'}}>Paste a TT3 timetable or AD1 backup link here.</p>
             <div className="form-group">
               <textarea 
                 rows={6}
                 style={{width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1'}}
                 value={pasteText} 
                 onChange={e => setPasteText(e.target.value)} 
-                placeholder="AD1:..."
+                placeholder="https://.../?share=..."
               />
             </div>
             <button className="save-btn" style={{width: '100%'}} onClick={handlePasteSubmit}>Import</button>
