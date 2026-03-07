@@ -22,16 +22,19 @@ export default function ShareTimetable({ onClose }) {
     return `TT3:${compressed}`;
   };
 
+  const [pendingBackupData, setPendingBackupData] = useState(null);
+
   const generateBackupCode = () => {
     const data = {
       timetable: storage.getTimetable(),
       holidays: storage.getHolidays(),
       records: storage.getRecords(),
-      baseCounts: storage.getBaseCounts()
+      baseCounts: storage.getBaseCounts(),
+      startDate: storage.getStartDate()
     };
     const jsonStr = JSON.stringify(data);
     const compressed = LZString.compressToBase64(jsonStr);
-    return `TT4:${compressed}`;
+    return `AD1:${compressed}`;
   };
 
   const handleGenerate = async (isBackup = false) => {
@@ -84,8 +87,10 @@ export default function ShareTimetable({ onClose }) {
     try {
       let jsonStr = text.trim();
       let isTT4 = text.startsWith('TT4:');
+      let isAD1 = text.startsWith('AD1:');
+      let isFullBackup = isTT4 || isAD1;
       
-      if (text.startsWith('TT4:') || text.startsWith('TT3:') || text.startsWith('TT2:') || text.startsWith('TT1:')) {
+      if (isFullBackup || text.startsWith('TT3:') || text.startsWith('TT2:') || text.startsWith('TT1:')) {
         jsonStr = LZString.decompressFromBase64(text.substring(4));
         if (!jsonStr) {
            jsonStr = LZString.decompressFromEncodedURIComponent(text.substring(4));
@@ -126,22 +131,37 @@ export default function ShareTimetable({ onClose }) {
          throw new Error("Invalid format");
       }
       
+      if (isFullBackup) {
+          setPendingBackupData(data);
+          setMode('confirm-backup');
+          return;
+      }
+      
       if (importedTt.length > 0) {
           storage.saveTimetable(importedTt);
       }
       if (importedHolidays.length > 0) {
           storage.saveHolidays(importedHolidays);
       }
-      if (isTT4) {
-          if (data.records) storage.saveRecords(data.records);
-          if (data.baseCounts) storage.saveBaseCounts(data.baseCounts);
-      }
       
-      alert(isTT4 ? "Full Backup imported successfully!" : "Timetable imported successfully!");
+      alert("Timetable imported successfully!");
       onClose();
     } catch(e) {
       alert("Invalid code or format unsupported. " + e.message);
     }
+  };
+
+  const handleConfirmRestore = () => {
+    if (!pendingBackupData) return;
+    
+    if (pendingBackupData.timetable) storage.saveTimetable(pendingBackupData.timetable);
+    if (pendingBackupData.holidays) storage.saveHolidays(pendingBackupData.holidays);
+    if (pendingBackupData.records) storage.saveRecords(pendingBackupData.records);
+    if (pendingBackupData.baseCounts) storage.saveBaseCounts(pendingBackupData.baseCounts);
+    if (pendingBackupData.startDate) storage.saveStartDate(pendingBackupData.startDate);
+    
+    alert("Full Backup imported successfully! The app will now reload.");
+    window.location.reload();
   };
 
   return createPortal(
@@ -165,7 +185,7 @@ export default function ShareTimetable({ onClose }) {
             <button className="menu-btn" onClick={() => handleGenerate(true)}>
               <div className="icon">💾</div>
               <div style={{textAlign: 'left'}}>
-                <strong>Export Backup</strong>
+                <strong>My Data Backup</strong>
                 <div className="card-hint" style={{margin:0}}>Export timetable + full attendance</div>
               </div>
             </button>
@@ -234,10 +254,29 @@ export default function ShareTimetable({ onClose }) {
                 style={{width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1'}}
                 value={pasteText} 
                 onChange={e => setPasteText(e.target.value)} 
-                placeholder="TT3:..."
+                placeholder="AD1:..."
               />
             </div>
             <button className="save-btn" style={{width: '100%'}} onClick={handlePasteSubmit}>Import</button>
+          </div>
+        )}
+
+        {mode === 'confirm-backup' && pendingBackupData && (
+          <div className="confirm-container" style={{textAlign: 'center', padding: '20px'}}>
+            <h3 style={{marginBottom: '16px', color: '#1e293b'}}>Restore Backup?</h3>
+            <div style={{background: '#f8fafc', padding: '16px', borderRadius: '16px', textAlign: 'left', marginBottom: '24px'}}>
+              <p style={{margin: '0 0 8px 0', fontSize: '15px'}}><strong>{pendingBackupData.timetable?.length || 0}</strong> classes</p>
+              <p style={{margin: '0 0 8px 0', fontSize: '15px'}}><strong>{pendingBackupData.records?.length || 0}</strong> attendance records</p>
+              <p style={{margin: '0', fontSize: '15px'}}><strong>{pendingBackupData.holidays?.length || 0}</strong> holidays</p>
+            </div>
+            <p style={{fontSize: '14px', color: '#64748b', marginBottom: '24px'}}>This will completely replace all your current data on this device.</p>
+            
+            <button className="save-btn" style={{width: '100%', marginBottom: '12px'}} onClick={handleConfirmRestore}>
+              Restore All Data
+            </button>
+            <button className="cancel-btn" style={{width: '100%'}} onClick={() => setMode('menu')}>
+              Cancel
+            </button>
           </div>
         )}
       </div>
