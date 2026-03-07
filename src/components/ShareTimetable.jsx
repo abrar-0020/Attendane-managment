@@ -75,6 +75,7 @@ export default function ShareTimetable({ onClose }) {
   };
 
   const processImport = (text) => {
+    try {
       let jsonStr = text.trim();
       let isTT4 = text.startsWith('TT4:');
       
