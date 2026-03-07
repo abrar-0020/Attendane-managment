@@ -21,7 +21,8 @@ export default function CatchupWizard({ onComplete }) {
   }, []);
 
   const handleUpdate = (subject, field, value) => {
-    let num = value === '' ? '' : parseInt(value, 10);
+    const cleanValue = value.replace(/\D/g, '').slice(0, 2);
+    let num = cleanValue === '' ? '' : parseInt(cleanValue, 10);
     if (Number.isNaN(num)) num = '';
     else num = Math.max(0, num);
 
@@ -62,8 +63,10 @@ export default function CatchupWizard({ onComplete }) {
               <span className="subject-name">{sub}</span>
               <div className="counters">
                 <input 
-                  type="number" 
-                  min="0"
+                  type="text" 
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength="2"
                   value={counts[sub].attended} 
                   onChange={e => handleUpdate(sub, 'attended', e.target.value)} 
                   title="Classes Attended"
@@ -71,8 +74,10 @@ export default function CatchupWizard({ onComplete }) {
                 />
                 <span>/</span>
                 <input 
-                  type="number" 
-                  min="0"
+                  type="text" 
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength="2"
                   value={counts[sub].total} 
                   onChange={e => handleUpdate(sub, 'total', e.target.value)} 
                   title="Total Classes Held"
