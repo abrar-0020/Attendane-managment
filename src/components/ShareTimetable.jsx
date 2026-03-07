@@ -22,10 +22,23 @@ export default function ShareTimetable({ onClose }) {
     return `TT3:${compressed}`;
   };
 
-  const handleGenerate = async () => {
+  const generateBackupCode = () => {
+    const data = {
+      timetable: storage.getTimetable(),
+      holidays: storage.getHolidays(),
+      records: storage.getRecords(),
+      baseCounts: storage.getBaseCounts()
+    };
+    const jsonStr = JSON.stringify(data);
+    const compressed = LZString.compressToBase64(jsonStr);
+    return `TT4:${compressed}`;
+  };
+
+  const handleGenerate = async (isBackup = false) => {
     setMode('generate');
+    setPasteText(isBackup ? 'backup' : 'share'); // Reusing pasteText state temporarily to track mode for the copy button
     try {
-      const text = generateShareCode();
+      const text = isBackup ? generateBackupCode() : generateShareCode();
       const url = await QRCode.toDataURL(text, { width: 300, margin: 2, color: { dark: '#1e293b', light: '#ffffff' } });
       setQrSrc(url);
     } catch (e) {
@@ -62,10 +75,10 @@ export default function ShareTimetable({ onClose }) {
   };
 
   const processImport = (text) => {
-    try {
       let jsonStr = text.trim();
+      let isTT4 = text.startsWith('TT4:');
       
-      if (text.startsWith('TT3:') || text.startsWith('TT2:') || text.startsWith('TT1:')) {
+      if (text.startsWith('TT4:') || text.startsWith('TT3:') || text.startsWith('TT2:') || text.startsWith('TT1:')) {
         jsonStr = LZString.decompressFromBase64(text.substring(4));
         if (!jsonStr) {
            jsonStr = LZString.decompressFromEncodedURIComponent(text.substring(4));
@@ -112,8 +125,12 @@ export default function ShareTimetable({ onClose }) {
       if (importedHolidays.length > 0) {
           storage.saveHolidays(importedHolidays);
       }
+      if (isTT4) {
+          if (data.records) storage.saveRecords(data.records);
+          if (data.baseCounts) storage.saveBaseCounts(data.baseCounts);
+      }
       
-      alert("Timetable imported successfully!");
+      alert(isTT4 ? "Full Backup imported successfully!" : "Timetable imported successfully!");
       onClose();
     } catch(e) {
       alert("Invalid code or format unsupported. " + e.message);
@@ -130,11 +147,19 @@ export default function ShareTimetable({ onClose }) {
       <div className="portal-content">
         {mode === 'menu' && (
           <div className="share-menu grid-menu">
-            <button className="menu-btn" onClick={handleGenerate}>
+            <button className="menu-btn" onClick={() => handleGenerate(false)}>
               <div className="icon">📱</div>
               <div style={{textAlign: 'left'}}>
-                <strong>Generate QR</strong>
-                <div className="card-hint" style={{margin:0}}>Show code to your friend</div>
+                <strong>Share Timetable</strong>
+                <div className="card-hint" style={{margin:0}}>Share base schedule via QR/Text</div>
+              </div>
+            </button>
+            
+            <button className="menu-btn" onClick={() => handleGenerate(true)}>
+              <div className="icon">💾</div>
+              <div style={{textAlign: 'left'}}>
+                <strong>Export Backup</strong>
+                <div className="card-hint" style={{margin:0}}>Export timetable + full attendance</div>
               </div>
             </button>
             
@@ -155,13 +180,14 @@ export default function ShareTimetable({ onClose }) {
             </button>
           </div>
         )}
-
+        
         {mode === 'generate' && (
           <div className="qr-display">
             <h3>Scan this Code</h3>
             {qrSrc ? <img src={qrSrc} alt="QR Code" /> : <p>Generating...</p>}
             <button className="copy-btn" onClick={() => {
-              navigator.clipboard.writeText(generateShareCode());
+              const code = qrSrc && qrSrc.length > 50 ? (pasteText === 'backup' ? generateBackupCode() : generateShareCode()) : generateShareCode();
+              navigator.clipboard.writeText(code);
               alert('Copied text code to clipboard!');
             }}>Copy Text Version</button>
           </div>
