@@ -83,13 +83,7 @@ export default function TimetableEditor() {
 
   return (
     <div className="settings-view">
-      {/* Header */}
-      <header className="set-header">
-        <div className="set-header-inner">
-          <h1 className="set-app-title">AttendMe</h1>
 
-        </div>
-      </header>
 
       <main className="set-main">
         <h2 className="set-page-title">Settings</h2>
