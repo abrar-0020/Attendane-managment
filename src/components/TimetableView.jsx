@@ -142,8 +142,8 @@ export default function TimetableView() {
               const thisEnd = cls.endtime ? cls.endtime.replace(/\s*[A-Z]+/i, '').trim() : '';
               const nextStart = nextCls.starttime ? nextCls.starttime.replace(/\s*[A-Z]+/i, '').trim() : '';
               
-              if (thisEnd.includes('12:35') || thisEnd.includes('12:45') || cls.hour === 4) {
-                 if (nextCls.hour > cls.hour) {
+              if (thisEnd.includes('12:35') || thisEnd.includes('12:40') || thisEnd.includes('12:45') || String(cls.hour) === '4') {
+                 if (Number(nextCls.hour) > Number(cls.hour)) {
                     showLunchBreak = true;
                  }
               }
