@@ -116,6 +116,74 @@
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Primary - Soft Indigo */
+    --primary: #bac3ff;
+    --on-primary: #0f2175;
+    --primary-container: #2b398b;
+    --on-primary-container: #dee0ff;
+    --primary-fixed: #dee0ff;
+    --primary-fixed-dim: #bac3ff;
+    --on-primary-fixed: #00105b;
+    --on-primary-fixed-variant: #2f3f92;
+    --inverse-primary: #4352a5;
+
+    /* Secondary - Calm Green */
+    --secondary: #83da85;
+    --on-secondary: #003910;
+    --secondary-container: #005318;
+    --on-secondary-container: #9ff79f;
+    --secondary-fixed: #9ff79f;
+    --secondary-fixed-dim: #83da85;
+    --on-secondary-fixed: #002105;
+    --on-secondary-fixed-variant: #005318;
+
+    /* Tertiary - Soft Coral */
+    --tertiary: #ffb3ae;
+    --on-tertiary: #68000a;
+    --tertiary-container: #8d0313;
+    --on-tertiary-container: #ffdad7;
+    --tertiary-fixed: #ffdad7;
+    --tertiary-fixed-dim: #ffb3ae;
+    --on-tertiary-fixed: #410004;
+    --on-tertiary-fixed-variant: #910816;
+
+    /* Error */
+    --error: #ffb4ab;
+    --on-error: #690005;
+    --error-container: #93000a;
+    --on-error-container: #ffdad6;
+
+    /* Surface Tonal */
+    --background: #111318;
+    --on-background: #e2e2e9;
+    --surface: #111318;
+    --on-surface: #e2e2e9;
+    --surface-dim: #111318;
+    --surface-bright: #37393e;
+    --surface-container-lowest: #0c0e13;
+    --surface-container-low: #1a1b20;
+    --surface-container: #1e1f25;
+    --surface-container-high: #282a2f;
+    --surface-container-highest: #33353a;
+    --surface-variant: #45464f;
+    --on-surface-variant: #c5c6d0;
+    --inverse-surface: #e2e2e9;
+    --inverse-on-surface: #2e3035;
+
+    /* Outline */
+    --outline: #8f9099;
+    --outline-variant: #45464f;
+    --surface-tint: #bac3ff;
+
+    /* ELEVATION SHADOWS */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.8);
+  }
+}
+
 /* ===== BASE RESET ===== */
 * {
   box-sizing: border-box;
