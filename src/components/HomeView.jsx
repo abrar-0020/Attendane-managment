@@ -151,7 +151,16 @@ export default function HomeView({ onNavigate }) {
             <h2 className="home-section-label">Up next</h2>
             <div className="home-next-card">
               <div className="home-next-dot" />
-              <h3 className="home-next-subject">{nextClass.subject}</h3>
+              <h3 className="home-next-subject">
+                {nextClass.subjectName && nextClass.subjectName !== nextClass.subject ? (
+                  <>
+                    <span style={{ fontSize: '12px', color: 'var(--primary)', display: 'block', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{nextClass.subject}</span>
+                    {nextClass.subjectName}
+                  </>
+                ) : (
+                  nextClass.subject
+                )}
+              </h3>
               <p className="home-next-meta">
                 {nextClass.starttime} – {nextClass.endtime}
                 {nextClass.room ? ` · ${nextClass.room}` : ''}

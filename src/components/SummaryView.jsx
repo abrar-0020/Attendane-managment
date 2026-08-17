@@ -52,6 +52,7 @@ export default function SummaryView() {
 
       statsArray.push({
         subject: sub,
+        subjectName: timetable.find(t => t.subject === sub)?.subjectName || sub,
         weeklyCount,
         attended: overallSubAttended,
         total: overallSubTotal,
@@ -172,8 +173,8 @@ export default function SummaryView() {
                   <div className="sv-subject-row">
                     <div className="sv-subject-dot" style={{ background: statusColor }} />
                     <div className="sv-subject-info">
-                      <h4 className="sv-subject-name">{stat.subject}</h4>
-                      <span className="sv-subject-meta">{stat.attended}/{stat.total} classes · {stat.weeklyCount}/wk</span>
+                      <h4 className="sv-subject-name">{stat.subjectName || stat.subject}</h4>
+                      <span className="sv-subject-meta">{stat.subject !== stat.subjectName ? stat.subject + ' · ' : ''}{stat.attended}/{stat.total} classes · {stat.weeklyCount}/wk</span>
                     </div>
                     <div className="sv-subject-right">
                       <span className={`sv-pct-badge ${statusClass}`} style={{ color: statusColor, background: statusColor + '1a' }}>

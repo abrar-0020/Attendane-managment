@@ -53,10 +53,21 @@
 
 .cc-subject {
   font-family: var(--font-title-md);
-  font-size: var(--text-title-md);
+  font-size: var(--font-title-md-size);
   color: var(--on-surface);
   font-weight: 600;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cc-subject-code {
+  font-size: var(--font-label-sm-size);
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  margin-bottom: 2px;
 }
 
 .cc-subject.line-through {
@@ -67,7 +78,7 @@
   background-color: var(--error-container);
   color: var(--on-error-container);
   font-family: var(--font-label-sm);
-  font-size: var(--text-label-sm);
+  font-size: var(--font-label-sm-size);
   padding: 2px 8px;
   border-radius: 9999px;
 }
@@ -79,7 +90,7 @@
   gap: 8px;
   color: var(--on-surface-variant);
   font-family: var(--font-body-md);
-  font-size: var(--text-body-md);
+  font-size: var(--font-body-md-size);
 }
 
 .cc-meta.line-through {

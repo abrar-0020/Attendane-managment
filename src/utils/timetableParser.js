@@ -147,7 +147,7 @@ export const parseTimetableText = (text) => {
     }
 
     if (isValid) {
-      result.entries.push({ day, hour, starttime, endtime, subject: subjectCode, room });
+      result.entries.push({ day, hour, starttime, endtime, subject: subjectCode, subjectName: subjectMap.get(subjectCode) || subjectCode, room });
     }
   }
 

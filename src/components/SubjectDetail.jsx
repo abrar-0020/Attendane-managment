@@ -51,7 +51,16 @@ export default function SubjectDetail({ stat, onClose }) {
         {/* Subject Header */}
         <section className="sd-section">
           <div className="sd-subject-indicator"></div>
-          <h1 className="sd-subject-title">{stat.subject}</h1>
+          <h1 className="sd-subject-title">
+            {stat.subjectName && stat.subjectName !== stat.subject ? (
+              <>
+                <span style={{ fontSize: '14px', color: 'var(--primary)', display: 'block', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.subject}</span>
+                {stat.subjectName}
+              </>
+            ) : (
+              stat.subject
+            )}
+          </h1>
           <p className="sd-subject-meta">{room ? `Room ${room}` : 'No room assigned'}</p>
 
           {/* Stat Row */}
