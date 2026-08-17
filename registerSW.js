@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Attendane--managment-Antigravity-/sw.js', { scope: '/Attendane--managment-Antigravity-/' })})}
