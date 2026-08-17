@@ -54,10 +54,7 @@ export default function TimetableView() {
             <span className="material-symbols-outlined text-[24px]">account_circle</span>
           </button>
           <h1 className="tv-app-title">AttendMe</h1>
-          <button className="tv-notif-btn">
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="tv-notif-dot"></span>
-          </button>
+
         </div>
       </header>
 

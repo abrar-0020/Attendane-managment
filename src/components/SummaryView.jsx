@@ -95,9 +95,7 @@ export default function SummaryView() {
       <header className="sv-header">
         <div className="sv-header-inner">
           <h1 className="sv-app-title">AttendMe</h1>
-          <button className="sv-icon-btn">
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
+
         </div>
       </header>
 

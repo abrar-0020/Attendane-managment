@@ -42,9 +42,7 @@ export default function SubjectDetail({ stat, onClose }) {
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div className="sd-app-title">AttendMe</div>
-        <button className="sd-icon-btn">
-          <span className="material-symbols-outlined">notifications</span>
-        </button>
+
       </header>
 
       <main className="sd-main">

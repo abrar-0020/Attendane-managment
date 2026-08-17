@@ -65,9 +65,7 @@ export default function TimetableEditor() {
       <header className="set-header">
         <div className="set-header-inner">
           <h1 className="set-app-title">AttendMe</h1>
-          <button className="set-icon-btn">
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
+
         </div>
       </header>
 
