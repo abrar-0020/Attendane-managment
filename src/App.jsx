@@ -7,7 +7,7 @@ import TimetableView from './components/TimetableView';
 import SummaryView from './components/SummaryView';
 import TimetableEditor from './components/TimetableEditor';
 import ShareTimetable from './components/ShareTimetable';
-import { syncAttendance } from "./services/syncAttendance";
+
 import './App.css';
 
 export default function App() {
@@ -56,11 +56,6 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (appState === "main" && storage.hasProfile()) {
-      syncAttendance();
-    }
-  }, [appState]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;

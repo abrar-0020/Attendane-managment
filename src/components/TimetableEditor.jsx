@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { storage } from '../services/storage';
 import { dateUtils } from '../utils/dateUtils';
 import { notificationsService } from '../services/notifications';
-import { syncAttendance, processAttendanceJson } from '../services/syncAttendance';
+
 import TimetableManagement from './TimetableManagement';
 import HolidayManagement from './HolidayManagement';
 import ShareTimetable from './ShareTimetable';
@@ -14,13 +14,7 @@ export default function TimetableEditor() {
   const [startDate, setStartDate] = useState(() => storage.getStartDate());
   const [activeModal, setActiveModal] = useState(null);
   const [notifPrefs, setNotifPrefs] = useState(() => storage.getNotificationPrefs());
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [lastSyncTime, setLastSyncTime] = useState(() => {
-    const time = localStorage.getItem('last_sync_time');
-    return time ? new Date(time).toLocaleString() : 'Never';
-  });
-  const [jsonInput, setJsonInput] = useState('');
-  const [showJsonInput, setShowJsonInput] = useState(false);
+
   const profile = storage.getProfile() || {};
 
   useEffect(() => {
@@ -32,49 +26,7 @@ export default function TimetableEditor() {
     notificationsService.syncTimetableToCache();
   }, [notifPrefs]);
 
-  const handleJsonSubmit = () => {
-    try {
-      const parsedData = JSON.parse(jsonInput);
-      function formatDate(d) {
-        const [day, month, year] = d.split("-");
-        return `${year}-${month}-${day}`;
-      }
-      const records = parsedData.data?.report || [];
-      if (!Array.isArray(records)) return alert("❌ Attendance data is not in array format");
-      records.forEach(day => {
-        const date = formatDate(day.attendance_date);
-        if (!day.hourDetails) return;
-        day.hourDetails.forEach(hour => {
-          if (!hour || !hour.status) return;
-          const subject = hour.subjectName || `Subject-${hour.subjectId || 0}`;
-          const hourNum = hour.hourNumber || 1;
-          const status = hour.status === "PRESENT" ? "present" : hour.status === "ABSENT" ? "absent" : null;
-          if (!status) return;
-          storage.addRecord({ date, subject, hour: hourNum, status });
-        });
-      });
-      alert(`✅ Successfully imported ${records.length} attendance records!`);
-      setJsonInput('');
-      setShowJsonInput(false);
-      window.location.reload();
-    } catch (e) {
-      alert("❌ Failed to parse JSON: " + e.message);
-    }
-  };
 
-  const handleSync = async () => {
-    setIsSyncing(true);
-    try {
-      await syncAttendance();
-      const time = localStorage.getItem('last_sync_time');
-      if (time) setLastSyncTime(new Date(time).toLocaleString());
-      alert('Attendance synced successfully!');
-    } catch (error) {
-      alert('Failed to sync attendance.');
-    } finally {
-      setIsSyncing(false);
-    }
-  };
 
   const handleToggleReminder = async (e) => {
     if (e.target.checked) {
@@ -298,46 +250,7 @@ export default function TimetableEditor() {
               </div>
               <span className="material-symbols-outlined set-chevron">chevron_right</span>
             </button>
-            <div className="set-divider" />
-            
-            <button className="set-list-item" onClick={() => setShowJsonInput(!showJsonInput)}>
-              <span className="material-symbols-outlined set-row-icon">cloud_upload</span>
-              <div className="set-item-text">
-                <span className="set-row-title">Import Linways JSON</span>
-                <span className="set-row-sub">Paste your attendance JSON payload</span>
-              </div>
-              <span className="material-symbols-outlined set-chevron">
-                {showJsonInput ? 'expand_less' : 'expand_more'}
-              </span>
-            </button>
 
-            {showJsonInput && (
-              <div className="set-json-panel">
-                <textarea
-                  className="set-textarea"
-                  placeholder="Paste JSON here..."
-                  value={jsonInput}
-                  onChange={e => setJsonInput(e.target.value)}
-                  rows={5}
-                />
-                <button
-                  className="set-primary-btn"
-                  onClick={handleJsonSubmit}
-                  disabled={!jsonInput.trim()}
-                >
-                  Import JSON
-                </button>
-              </div>
-            )}
-
-            <div className="set-divider" />
-            <div className="set-row set-row-info">
-              <span className="material-symbols-outlined set-row-icon">history</span>
-              <div>
-                <span className="set-row-title">Last Sync</span>
-                <span className="set-row-sub">{lastSyncTime}</span>
-              </div>
-            </div>
           </div>
         </section>
 
