@@ -113,13 +113,7 @@ export default function SummaryView() {
 
   return (
     <div className="summary-view">
-      {/* Top bar */}
-      <header className="sv-header">
-        <div className="sv-header-inner">
-          <h1 className="sv-app-title">AttendMe</h1>
 
-        </div>
-      </header>
 
       <main className="sv-main">
         <h2 className="sv-page-title">Statistics</h2>
