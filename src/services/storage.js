@@ -28,14 +28,16 @@ export const storage = {
     
     newClasses.forEach(nc => {
       // Uniqueness rule: Day + Hour + Subject
-      const exists = merged.some(ec => 
+      const existingIndex = merged.findIndex(ec => 
         ec.day === nc.day && 
         ec.hour === nc.hour && 
         ec.subject === nc.subject &&
         ec.starttime === nc.starttime &&
         ec.endtime === nc.endtime
       );
-      if (!exists) {
+      if (existingIndex > -1) {
+        merged[existingIndex] = { ...merged[existingIndex], ...nc };
+      } else {
         merged.push(nc);
       }
     });
