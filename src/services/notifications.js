@@ -95,7 +95,7 @@ export const notificationsService = {
       const timetable = storage.getTimetable();
       const prefs = storage.getNotificationPrefs();
       const data = new Response(JSON.stringify({ timetable, prefs }));
-      const cache = await caches.open('attendknow-notification-data');
+      const cache = await caches.open('attendme-notification-data');
       await cache.put('/api/notification-data', data);
     } catch (e) {
       console.warn('Failed to sync to cache', e);
