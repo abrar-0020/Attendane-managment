@@ -30,6 +30,16 @@ export default function ProfileSetup({ onComplete }) {
     try {
       if (importText.trim()) {
         let text = importText.trim();
+        
+        // Extract from URL if they pasted the whole URL
+        if (text.includes('/t/')) {
+          text = decodeURIComponent(text.split('/t/')[1]);
+        }
+        // Also support old ?share= URL format
+        else if (text.includes('?share=')) {
+          text = decodeURIComponent(text.split('?share=')[1]);
+        }
+
         let jsonStr = text;
         let isAD1 = text.startsWith('AD1:');
         let isTT4 = text.startsWith('TT4:');

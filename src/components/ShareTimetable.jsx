@@ -5,13 +5,15 @@ import { QRCodeSVG } from 'qrcode.react';
 import { storage } from '../services/storage';
 import './ShareTimetable.css';
 
-export default function ShareTimetable({ onClose }) {
+export default function ShareTimetable({ onClose, initialImportCode }) {
   const [shareCode, setShareCode] = useState('');
   const [shortDisplayCode, setShortDisplayCode] = useState('');
   const [copyDone, setCopyDone] = useState(false);
   const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
+    if (initialImportCode) return; // Don't generate a code if we are importing
+
     // Generate the full payload
     const data = { timetable: storage.getTimetable(), holidays: storage.getHolidays() };
     const compressed = LZString.compressToBase64(JSON.stringify(data));
@@ -20,11 +22,40 @@ export default function ShareTimetable({ onClose }) {
     
     setShareCode(url);
     
-    // Generate a visual "short code" from the hash for display (e.g. AM-7X29K)
-    // Note: This is purely visual to match the UI. The user copies the full URL.
+    // Generate a visual "short code" from the hash for display
     const hash = Math.abs(fullCode.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0));
     setShortDisplayCode(`AM-${hash.toString(36).toUpperCase().slice(0, 5).padEnd(5, 'X')}`);
-  }, []);
+  }, [initialImportCode]);
+
+  const processImport = () => {
+    try {
+      let code = initialImportCode;
+      if (code.includes('/t/')) code = decodeURIComponent(code.split('/t/')[1]);
+      else if (code.includes('?share=')) code = decodeURIComponent(code.split('?share=')[1]);
+      
+      let jsonStr = code;
+      if (code.startsWith('TT3:') || code.startsWith('TT2:') || code.startsWith('TT1:')) {
+        jsonStr = LZString.decompressFromBase64(code.substring(4));
+        if (!jsonStr) jsonStr = LZString.decompressFromEncodedURIComponent(code.substring(4));
+      }
+
+      const data = JSON.parse(jsonStr);
+      let importedTt = Array.isArray(data) ? data : (data.timetable || []);
+      let importedHolidays = data.holidays || [];
+
+      if (importedTt.length > 0) {
+        storage.importTimetableData(importedTt);
+        if (importedHolidays.length > 0) localStorage.setItem('attendance_holidays', JSON.stringify(importedHolidays));
+        alert('Timetable imported successfully!');
+        window.location.reload();
+      } else {
+        throw new Error("No classes found");
+      }
+    } catch (e) {
+      alert("Invalid or broken link. Could not import timetable.");
+      onClose();
+    }
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareCode);
@@ -58,7 +89,21 @@ export default function ShareTimetable({ onClose }) {
       <div className="share-sheet" onClick={e => e.stopPropagation()}>
         <div className="share-drag-handle" />
 
-        {!showQR ? (
+        {initialImportCode ? (
+          <>
+            <h2 className="share-title">Import Timetable</h2>
+            <p style={{ textAlign: 'center', marginBottom: '24px', color: 'var(--on-surface-variant)', fontSize: '14px' }}>
+              You are about to import a shared timetable. This will add the new classes to your schedule.
+            </p>
+            <button className="share-btn-primary" onClick={processImport}>
+              <span className="material-symbols-outlined">download</span>
+              Import Now
+            </button>
+            <button className="share-btn-primary" style={{ background: 'transparent', color: 'var(--on-surface)', marginTop: '12px' }} onClick={onClose}>
+              Cancel
+            </button>
+          </>
+        ) : !showQR ? (
           <>
             <h2 className="share-title">Share your timetable</h2>
 
