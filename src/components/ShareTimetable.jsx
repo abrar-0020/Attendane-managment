@@ -16,7 +16,7 @@ export default function ShareTimetable({ onClose }) {
     const data = { timetable: storage.getTimetable(), holidays: storage.getHolidays() };
     const compressed = LZString.compressToBase64(JSON.stringify(data));
     const fullCode = `TT3:${compressed}`;
-    const url = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(fullCode)}`;
+    const url = `https://attendme.app/t/${encodeURIComponent(fullCode)}`;
     
     setShareCode(url);
     

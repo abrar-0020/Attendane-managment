@@ -24,10 +24,15 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const shareQuery = params.get('share');
+    let shareQuery = params.get('share');
+    
+    if (window.location.pathname.startsWith('/t/')) {
+      shareQuery = decodeURIComponent(window.location.pathname.split('/t/')[1]);
+    }
+
     if (shareQuery) {
       setSharedCode(shareQuery);
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, '', '/');
     }
 
     const timer = setTimeout(() => {
