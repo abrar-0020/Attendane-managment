@@ -7,7 +7,7 @@ export default function ClassCard({ cls, status, edgeColor, onUpdateStatus }) {
   const menuRef = useRef();
   const timerRef = useRef(null);
   const touchStartY = useRef(0);
-  const SCROLL_THRESHOLD = 10;
+  const SCROLL_THRESHOLD = 20;
 
   const handleUpdate = (newStatus) => {
     onUpdateStatus(cls.subject, cls.hour, newStatus);
@@ -18,13 +18,13 @@ export default function ClassCard({ cls, status, edgeColor, onUpdateStatus }) {
     touchStartY.current = e.clientY;
     setIsPressed(true);
     timerRef.current = setTimeout(() => {
-      // 2 seconds held = toggle absent
+      // Long press = toggle absent
       const nextStatus = status === 'absent' ? 'unmarked' : 'absent';
       handleUpdate(nextStatus);
       timerRef.current = null;
       setIsPressed(false);
       if (navigator.vibrate) navigator.vibrate([60, 30, 60]);
-    }, 2000);
+    }, 600);
   };
 
   const handlePointerMove = (e) => {
