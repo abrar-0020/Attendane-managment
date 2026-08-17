@@ -44,8 +44,12 @@ export default function QRScannerModal({ onClose }) {
       
       try {
         const urlObj = new URL(jsonStr);
-        const shareParam = urlObj.searchParams.get('share');
-        if (shareParam) jsonStr = shareParam.trim();
+        if (urlObj.pathname.startsWith('/t/')) {
+          jsonStr = decodeURIComponent(urlObj.pathname.split('/t/')[1]);
+        } else {
+          const shareParam = urlObj.searchParams.get('share');
+          if (shareParam) jsonStr = shareParam.trim();
+        }
       } catch (e) { /* not a URL */ }
 
       let isTT4 = jsonStr.startsWith('TT4:');
