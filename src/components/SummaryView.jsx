@@ -14,6 +14,28 @@ export default function SummaryView() {
     calculateStats();
   }, []);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      if (selectedStat) {
+        setSelectedStat(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [selectedStat]);
+
+  const openSubjectDetail = (stat) => {
+    window.history.pushState({ modal: 'subject' }, '');
+    setSelectedStat(stat);
+  };
+
+  const closeSubjectDetail = () => {
+    setSelectedStat(null);
+    if (window.history.state?.modal === 'subject') {
+      window.history.back();
+    }
+  };
+
   const calculateStats = () => {
     const timetable = storage.getTimetable();
     const records = storage.getRecords();
@@ -166,7 +188,7 @@ export default function SummaryView() {
                 <div
                   key={stat.subject}
                   className="sv-subject-card"
-                  onClick={() => setSelectedStat(stat)}
+                  onClick={() => openSubjectDetail(stat)}
                 >
                   <div className="sv-subject-row">
                     <div className="sv-subject-dot" style={{ background: statusColor }} />
@@ -213,7 +235,7 @@ export default function SummaryView() {
       </main>
       
       {selectedStat && (
-        <SubjectDetail stat={selectedStat} onClose={() => setSelectedStat(null)} />
+        <SubjectDetail stat={selectedStat} onClose={closeSubjectDetail} />
       )}
     </div>
   );

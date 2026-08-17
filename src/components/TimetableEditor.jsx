@@ -26,6 +26,28 @@ export default function TimetableEditor() {
     notificationsService.syncTimetableToCache();
   }, [notifPrefs]);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      if (activeModal) {
+        setActiveModal(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeModal]);
+
+  const openModal = (modalName) => {
+    window.history.pushState({ modal: modalName }, '');
+    setActiveModal(modalName);
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+    if (window.history.state?.modal) {
+      window.history.back();
+    }
+  };
+
 
 
   const handleToggleReminder = async (e) => {
@@ -115,7 +137,7 @@ export default function TimetableEditor() {
         <section className="set-section">
           <h3 className="set-section-label">Timetable</h3>
           <div className="set-card set-card-list">
-            <button className="set-list-item" onClick={() => setActiveModal('timetable')}>
+            <button className="set-list-item" onClick={() => openModal('timetable')}>
               <span className="material-symbols-outlined set-row-icon">edit_calendar</span>
               <div className="set-item-text">
                 <span className="set-row-title">Manage Classes</span>
@@ -124,7 +146,7 @@ export default function TimetableEditor() {
               <span className="material-symbols-outlined set-chevron">chevron_right</span>
             </button>
             <div className="set-divider" />
-            <button className="set-list-item" onClick={() => setActiveModal('holiday')}>
+            <button className="set-list-item" onClick={() => openModal('holiday')}>
               <span className="material-symbols-outlined set-row-icon">beach_access</span>
               <div className="set-item-text">
                 <span className="set-row-title">Manage Holidays</span>
@@ -133,7 +155,7 @@ export default function TimetableEditor() {
               <span className="material-symbols-outlined set-chevron">chevron_right</span>
             </button>
             <div className="set-divider" />
-            <button className="set-list-item" onClick={() => setActiveModal('share')}>
+            <button className="set-list-item" onClick={() => openModal('share')}>
               <span className="material-symbols-outlined set-row-icon">ios_share</span>
               <div className="set-item-text">
                 <span className="set-row-title">Share Timetable</span>
@@ -230,7 +252,7 @@ export default function TimetableEditor() {
         <section className="set-section">
           <h3 className="set-section-label">Data</h3>
           <div className="set-card set-card-list">
-            <button className="set-list-item" onClick={() => setActiveModal('textImport')}>
+            <button className="set-list-item" onClick={() => openModal('textImport')}>
               <span className="material-symbols-outlined set-row-icon">content_paste_go</span>
               <div className="set-item-text">
                 <span className="set-row-title">Import Timetable from Text</span>
@@ -240,7 +262,7 @@ export default function TimetableEditor() {
             </button>
             <div className="set-divider" />
             
-            <button className="set-list-item" onClick={() => setActiveModal('qrScanner')}>
+            <button className="set-list-item" onClick={() => openModal('qrScanner')}>
               <span className="material-symbols-outlined set-row-icon">qr_code_scanner</span>
               <div className="set-item-text">
                 <span className="set-row-title">Scan QR Code</span>
@@ -263,11 +285,11 @@ export default function TimetableEditor() {
         </section>
       </main>
 
-      {activeModal === 'timetable' && <TimetableManagement onClose={() => setActiveModal(null)} />}
-      {activeModal === 'holiday' && <HolidayManagement onClose={() => setActiveModal(null)} />}
-      {activeModal === 'share' && <ShareTimetable onClose={() => setActiveModal(null)} />}
-      {activeModal === 'textImport' && <TextImportModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'qrScanner' && <QRScannerModal onClose={() => setActiveModal(null)} />}
+      {activeModal === 'timetable' && <TimetableManagement onClose={closeModal} />}
+      {activeModal === 'holiday' && <HolidayManagement onClose={closeModal} />}
+      {activeModal === 'share' && <ShareTimetable onClose={closeModal} />}
+      {activeModal === 'textImport' && <TextImportModal onClose={closeModal} />}
+      {activeModal === 'qrScanner' && <QRScannerModal onClose={closeModal} />}
     </div>
   );
 }

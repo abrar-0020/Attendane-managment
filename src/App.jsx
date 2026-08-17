@@ -33,6 +33,7 @@ export default function App() {
     if (shareQuery) {
       setSharedCode(shareQuery);
       window.history.replaceState({}, '', '/');
+      window.history.pushState({ modal: 'share' }, '', '/');
     }
 
     const timer = setTimeout(() => {
@@ -55,6 +56,23 @@ export default function App() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (sharedCode) {
+        setSharedCode(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [sharedCode]);
+
+  const closeSharedCode = () => {
+    setSharedCode(null);
+    if (window.history.state?.modal === 'share') {
+      window.history.back();
+    }
+  };
 
 
   const handleInstallClick = async () => {
@@ -118,7 +136,7 @@ export default function App() {
     return (
       <>
         <SplashScreen />
-        {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={() => setSharedCode(null)} />}
+        {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={closeSharedCode} />}
       </>
     );
   }
@@ -127,7 +145,7 @@ export default function App() {
     return (
       <>
         <ProfileSetup onComplete={() => setAppState('main')} />
-        {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={() => setSharedCode(null)} />}
+        {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={closeSharedCode} />}
       </>
     );
   }
@@ -175,7 +193,7 @@ export default function App() {
         </button>
       </nav>
 
-      {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={() => setSharedCode(null)} />}
+      {sharedCode && <ShareTimetable initialImportCode={sharedCode} onClose={closeSharedCode} />}
     </div>
   );
 }
