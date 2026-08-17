@@ -3,11 +3,16 @@ import './SplashScreen.css';
 export default function SplashScreen() {
   return (
     <div className="splash-screen">
-      <div className="logo-container">
-        <div className="logo-icon">🗓️</div>
-        <h1 className="logo-text">Attendknow</h1>
-        <div className="loading-dots">
-          <div></div><div></div><div></div>
+      <div className="splash-content">
+        <div className="splash-icon">
+          <span className="material-symbols-outlined splash-icon-symbol">calendar_today</span>
+        </div>
+        <h1 className="splash-title">AttendMe</h1>
+        <p className="splash-tagline">Track. Know. Stay Safe.</p>
+        <div className="splash-loader">
+          <div className="splash-dot"></div>
+          <div className="splash-dot"></div>
+          <div className="splash-dot"></div>
         </div>
       </div>
     </div>

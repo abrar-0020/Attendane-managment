@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AttendMe - Import Timetable</title>
+<!-- Google Fonts: Manrope -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from instructions -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2e3132",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#4858ab",
+                    "tertiary": "#ab2126",
+                    "tertiary-fixed-dim": "#ffb3ae",
+                    "primary": "#4352a5",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#bac3ff",
+                    "surface-container": "#edeeef",
+                    "surface-dim": "#d9dadb",
+                    "on-primary-container": "#f8f6ff",
+                    "on-surface-variant": "#454651",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#bac3ff",
+                    "on-secondary-container": "#19722b",
+                    "primary-fixed": "#dee0ff",
+                    "background": "#f8f9fa",
+                    "tertiary-container": "#ce3b3b",
+                    "on-tertiary-fixed": "#410004",
+                    "secondary-fixed": "#9ff79f",
+                    "surface-container-highest": "#e1e3e4",
+                    "outline-variant": "#c6c5d3",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#191c1d",
+                    "on-secondary-fixed-variant": "#005318",
+                    "surface-variant": "#e1e3e4",
+                    "surface-bright": "#f8f9fa",
+                    "on-tertiary-container": "#fff5f4",
+                    "secondary": "#126d27",
+                    "surface-container-low": "#f3f4f5",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#002105",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "outline": "#767683",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed-variant": "#910816",
+                    "inverse-on-surface": "#f0f1f2",
+                    "surface": "#f8f9fa",
+                    "on-primary-fixed": "#00105b",
+                    "tertiary-fixed": "#ffdad7",
+                    "on-background": "#191c1d",
+                    "primary-container": "#5c6bc0",
+                    "secondary-fixed-dim": "#83da85",
+                    "secondary-container": "#9cf49c",
+                    "on-primary-fixed-variant": "#2f3f92",
+                    "surface-container-high": "#e7e8e9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "xl": "64px",
+                    "gutter": "24px",
+                    "sm": "12px",
+                    "xs": "4px",
+                    "base": "8px",
+                    "margin-desktop": "48px",
+                    "md": "24px",
+                    "lg": "40px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Manrope", "sans-serif"],
+                    "title-md": ["Manrope", "sans-serif"],
+                    "body-md": ["Manrope", "sans-serif"],
+                    "headline-lg": ["Manrope", "sans-serif"],
+                    "headline-lg-mobile": ["Manrope", "sans-serif"],
+                    "display-metric": ["Manrope", "sans-serif"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                    "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                    "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                    "display-metric": ["48px", { "lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d9dadb; border-radius: 10px; }
+        
+        /* Smooth transitions */
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar (From JSON Source of Truth - Navigation Suppressed via intent, Header Retained for anchor) -->
+<header class="w-full top-0 sticky bg-surface dark:bg-surface-dim z-50 transition-colors duration-300">
+<div class="flex items-center justify-between px-margin-mobile h-16 w-full max-w-7xl mx-auto">
+<!-- Leading action adapted to "Close" for this transactional flow to maintain 'quiet' UX -->
+<button class="text-on-surface-variant hover:bg-surface-container rounded-full p-2 transition-colors active:scale-95 duration-100 flex items-center justify-center" onclick="alert('Cancelling import flow...')">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim select-none tracking-tight">
+                AttendMe
+            </div>
+<!-- Trailing icon disabled for focus, replaced with invisible placeholder to center title perfectly -->
+<div class="w-10 h-10"></div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-2xl mx-auto px-margin-mobile py-lg pb-32">
+<!-- Section 1: The Import Setup -->
+<section class="mb-xl transition-all duration-500" id="setup-section">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-base">Import a shared timetable</h1>
+<p class="font-body-md text-on-surface-variant mb-lg max-w-md">
+                Paste a code or link provided by your professor or institution to automatically populate your schedule.
+            </p>
+<div class="bg-surface-container-lowest rounded-xl p-sm shadow-[0_4px_16px_rgba(0,0,0,0.04)] ring-1 ring-outline-variant/30 focus-within:ring-2 focus-within:ring-primary focus-within:shadow-[0_8px_24px_rgba(67,82,165,0.12)] transition-all duration-200">
+<label class="sr-only" for="share-code">Enter share code or link</label>
+<div class="flex flex-col sm:flex-row gap-sm">
+<input autocomplete="off" class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-on-surface placeholder:text-outline p-sm rounded-lg" id="share-code" placeholder="e.g., https://attendme.app/t/x8k9j2" type="text"/>
+<button class="bg-primary text-on-primary font-title-md text-title-md rounded-lg px-md py-sm flex items-center justify-center gap-xs hover:bg-primary/90 hover:shadow-md active:scale-95 transition-all duration-200 whitespace-nowrap" id="btn-import">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">download</span>
+                        Import timetable
+                    </button>
+</div>
+</div>
+</section>
+<!-- Section 2: Review & Edit (Hidden initially, revealed via JS) -->
+<section class="hidden opacity-0 translate-y-4 transition-all duration-500" id="review-section">
+<!-- Contextual Banner -->
+<div class="bg-surface-variant text-on-surface rounded-xl p-md flex items-start gap-md mb-lg">
+<span class="material-symbols-outlined text-primary mt-1" style="font-variation-settings: 'FILL' 1;">info</span>
+<div>
+<h3 class="font-title-md text-title-md text-on-surface mb-xs">Review before saving</h3>
+<p class="font-body-md text-on-surface-variant text-sm">
+                        We've parsed the timetable. Please review the classes below. You can tap on any block to edit the details before committing them to your schedule.
+                    </p>
+</div>
+</div>
+<!-- Parsed Timetable List (Bento-inspired editable cards) -->
+<div class="space-y-xl">
+<!-- Day Group -->
+<div>
+<h2 class="font-title-md text-title-md text-on-surface-variant mb-sm sticky top-16 bg-surface/90 backdrop-blur-sm py-xs z-10">Monday</h2>
+<div class="flex flex-col gap-sm">
+<!-- Editable Class Card 1 -->
+<div class="group relative bg-surface-container-lowest rounded-xl p-md border border-outline-variant/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-primary/30 transition-all duration-200 cursor-pointer overflow-hidden">
+<!-- Visual cue for editability -->
+<div class="absolute inset-y-0 left-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-sm">
+<div class="font-label-sm text-label-sm text-primary tracking-wider uppercase flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 09:00 AM - 10:30 AM
+                                </div>
+<button class="text-on-surface-variant opacity-40 group-hover:opacity-100 hover:text-primary transition-all p-1 -mr-2 -mt-2 rounded-full hover:bg-primary-container/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">edit</span>
+</button>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-xs">Advanced Calculus IV</h3>
+<div class="flex flex-wrap items-center gap-x-md gap-y-xs mt-sm text-on-surface-variant font-body-md text-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Room 402, Science Wing
+                                </div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">person</span> Prof. J. Harrison
+                                </div>
+</div>
+</div>
+<!-- Editable Class Card 2 -->
+<div class="group relative bg-surface-container-lowest rounded-xl p-md border border-outline-variant/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-primary/30 transition-all duration-200 cursor-pointer overflow-hidden">
+<div class="absolute inset-y-0 left-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-sm">
+<div class="font-label-sm text-label-sm text-primary tracking-wider uppercase flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 11:00 AM - 12:30 PM
+                                </div>
+<button class="text-on-surface-variant opacity-40 group-hover:opacity-100 hover:text-primary transition-all p-1 -mr-2 -mt-2 rounded-full hover:bg-primary-container/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">edit</span>
+</button>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-xs">Modern World History</h3>
+<div class="flex flex-wrap items-center gap-x-md gap-y-xs mt-sm text-on-surface-variant font-body-md text-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Lecture Hall B
+                                </div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">person</span> Dr. E. Vance
+                                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Day Group -->
+<div>
+<h2 class="font-title-md text-title-md text-on-surface-variant mb-sm sticky top-16 bg-surface/90 backdrop-blur-sm py-xs z-10">Tuesday</h2>
+<div class="flex flex-col gap-sm">
+<!-- Editable Class Card 3 -->
+<div class="group relative bg-surface-container-lowest rounded-xl p-md border border-outline-variant/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-primary/30 transition-all duration-200 cursor-pointer overflow-hidden">
+<div class="absolute inset-y-0 left-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-sm">
+<div class="font-label-sm text-label-sm text-primary tracking-wider uppercase flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 01:00 PM - 04:00 PM
+                                </div>
+<button class="text-on-surface-variant opacity-40 group-hover:opacity-100 hover:text-primary transition-all p-1 -mr-2 -mt-2 rounded-full hover:bg-primary-container/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">edit</span>
+</button>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-xs">Organic Chemistry Lab</h3>
+<div class="flex flex-wrap items-center gap-x-md gap-y-xs mt-sm text-on-surface-variant font-body-md text-sm">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">location_on</span> Chem Lab 101
+                                </div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">person</span> T.A. Sarah Jenkins
+                                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Sticky Bottom Action Area -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/95 backdrop-blur-md pb-safe pt-md px-margin-mobile z-40 transform translate-y-full transition-transform duration-500 ease-out shadow-[0_-12px_40px_rgba(0,0,0,0.03)]" id="save-action">
+<div class="max-w-2xl mx-auto pb-lg">
+<button class="w-full bg-primary text-on-primary rounded-full py-md px-lg font-title-md text-title-md shadow-lg hover:bg-primary/90 hover:shadow-xl active:scale-[0.98] transition-all duration-200 flex justify-center items-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                Save timetable
+            </button>
+</div>
+</div>
+<script>
+        // Simple interaction logic to simulate the "import" process
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnImport = document.getElementById('btn-import');
+            const reviewSection = document.getElementById('review-section');
+            const saveAction = document.getElementById('save-action');
+            const inputField = document.getElementById('share-code');
+            const setupSection = document.getElementById('setup-section');
+
+            btnImport.addEventListener('click', () => {
+                if(!inputField.value) {
+                    // Simulate putting in a code if empty for the demo
+                    inputField.value = "https://attendme.app/t/FA24-CS101";
+                }
+
+                // Simulate loading state
+                const originalContent = btnImport.innerHTML;
+                btnImport.innerHTML = '<span class="material-symbols-outlined animate-spin" style="font-variation-settings: \'FILL\' 0;">sync</span> Parsing...';
+                btnImport.disabled = true;
+                btnImport.classList.add('opacity-80');
+
+                setTimeout(() => {
+                    // Reset button (optional, or hide it entirely)
+                    btnImport.innerHTML = originalContent;
+                    btnImport.disabled = false;
+                    btnImport.classList.remove('opacity-80');
+                    
+                    // Visually deemphasize setup section
+                    setupSection.classList.add('opacity-50', 'scale-[0.98]');
+                    inputField.disabled = true;
+
+                    // Reveal review section
+                    reviewSection.classList.remove('hidden');
+                    // Small delay to allow display:block to render before transitioning opacity
+                    requestAnimationFrame(() => {
+                        reviewSection.classList.remove('opacity-0', 'translate-y-4');
+                    });
+
+                    // Reveal sticky save button
+                    saveAction.classList.remove('translate-y-full');
+
+                    // Scroll down slightly
+                    window.scrollTo({
+                        top: 150,
+                        behavior: 'smooth'
+                    });
+
+                }, 1200); // 1.2s simulated network delay
+            });
+        });
+    </script>
+</body></html>

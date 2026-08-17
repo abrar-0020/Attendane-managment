@@ -1,0 +1,231 @@
+.sd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  color: var(--on-background);
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.sd-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: var(--surface);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--margin-mobile);
+  height: 64px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.sd-icon-btn {
+  color: var(--on-surface-variant);
+  border: none;
+  background: transparent;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sd-icon-btn:hover {
+  background: var(--surface-container);
+}
+
+.sd-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.sd-app-title {
+  font-family: var(--font-headline-lg-mobile);
+  font-size: var(--text-headline-lg-mobile);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.sd-header-spacer {
+  width: 40px;
+}
+
+.sd-main {
+  flex: 1;
+  padding: var(--md) var(--margin-mobile) var(--lg);
+  overflow-y: auto;
+}
+
+.sd-section {
+  margin-bottom: var(--lg);
+}
+
+.sd-subject-indicator {
+  width: 48px;
+  height: 8px;
+  background: var(--primary);
+  border-radius: 9999px;
+  margin-bottom: 16px;
+}
+
+.sd-subject-title {
+  font-family: var(--font-headline-lg-mobile);
+  font-size: 28px;
+  color: var(--on-surface);
+  margin: 0 0 12px 0;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sd-subject-meta {
+  font-family: var(--font-body-md);
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+.sd-stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: var(--md);
+  padding-bottom: var(--sm);
+  border-bottom: 1px solid var(--surface-variant);
+}
+
+.sd-stat-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-primary {
+  color: var(--primary) !important;
+}
+
+.sd-stat-label {
+  font-family: var(--font-label-sm);
+  font-size: var(--text-label-sm);
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 4px 0;
+}
+
+.sd-stat-value {
+  font-family: var(--font-headline-lg);
+  font-size: 32px;
+  color: var(--on-surface);
+  font-weight: 500;
+  margin: 4px 0 0 0;
+}
+
+.sd-insight-pill {
+  border-radius: 9999px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sd-insight-pill p {
+  font-family: var(--font-body-md);
+  font-size: 15px;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.sd-insight-pill.info {
+  background: rgba(67, 82, 165, 0.1);
+}
+.sd-insight-pill.info .material-symbols-outlined,
+.sd-insight-pill.info p {
+  color: var(--primary);
+}
+
+.sd-insight-pill.neutral {
+  background: var(--surface-variant);
+}
+.sd-insight-pill.neutral .material-symbols-outlined,
+.sd-insight-pill.neutral p {
+  color: var(--on-surface-variant);
+}
+
+.sd-section-title {
+  font-family: var(--font-title-md);
+  font-size: 20px;
+  color: var(--on-surface);
+  font-weight: 500;
+  margin: 0 0 16px 0;
+}
+
+.sd-history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sd-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--surface-variant);
+}
+
+.sd-history-item:last-child {
+  border-bottom: none;
+}
+
+.sd-history-date {
+  font-family: var(--font-body-md);
+  font-size: var(--text-body-md);
+  color: var(--on-surface);
+  font-weight: 400;
+  margin: 0;
+}
+
+.sd-history-meta {
+  font-family: var(--font-label-sm);
+  font-size: var(--text-label-sm);
+  color: var(--on-surface-variant);
+  margin: 4px 0 0 0;
+}
+
+.sd-history-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sd-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.sd-status-text {
+  font-family: var(--font-label-sm);
+  font-size: var(--text-label-sm);
+  color: var(--on-surface);
+}
+
+.sd-empty-text {
+  color: var(--on-surface-variant);
+  text-align: center;
+  margin-top: 16px;
+  font-size: var(--text-body-md);
+}

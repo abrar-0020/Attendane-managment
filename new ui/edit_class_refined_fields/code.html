@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Edit Class Sheet</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2e3132",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4858ab",
+                        "tertiary": "#ab2126",
+                        "tertiary-fixed-dim": "#ffb3ae",
+                        "primary": "#4352a5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#bac3ff",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-container": "#f8f6ff",
+                        "on-surface-variant": "#454651",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#bac3ff",
+                        "on-secondary-container": "#19722b",
+                        "primary-fixed": "#dee0ff",
+                        "background": "#f8f9fa",
+                        "tertiary-container": "#ce3b3b",
+                        "on-tertiary-fixed": "#410004",
+                        "secondary-fixed": "#9ff79f",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline-variant": "#c6c5d3",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed-variant": "#005318",
+                        "surface-variant": "#e1e3e4",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-container": "#fff5f4",
+                        "secondary": "#126d27",
+                        "surface-container-low": "#f3f4f5",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#002105",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#767683",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#910816",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface": "#f8f9fa",
+                        "on-primary-fixed": "#00105b",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-background": "#191c1d",
+                        "primary-container": "#5c6bc0",
+                        "secondary-fixed-dim": "#83da85",
+                        "secondary-container": "#9cf49c",
+                        "on-primary-fixed-variant": "#2f3f92",
+                        "surface-container-high": "#e7e8e9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "margin-desktop": "48px",
+                        "md": "24px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Manrope", "sans-serif"],
+                        "title-md": ["Manrope", "sans-serif"],
+                        "body-md": ["Manrope", "sans-serif"],
+                        "headline-lg": ["Manrope", "sans-serif"],
+                        "headline-lg-mobile": ["Manrope", "sans-serif"],
+                        "display-metric": ["Manrope", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-metric": ["48px", { "lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen relative overflow-hidden">
+<!-- Simulated Background Content (Timetable) -->
+<div class="p-margin-mobile opacity-30">
+<header class="flex items-center justify-between mb-lg">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">AttendMe</h1>
+<span class="material-symbols-outlined text-primary">notifications</span>
+</header>
+<div class="space-y-md">
+<div class="bg-surface-container rounded-xl p-md">
+<h2 class="font-title-md text-title-md">Mathematics 101</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">09:00 - 10:30 • Room 302</p>
+</div>
+<div class="bg-surface-container rounded-xl p-md">
+<h2 class="font-title-md text-title-md">Physics 202</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">11:00 - 12:30 • Lab A</p>
+</div>
+</div>
+</div>
+<!-- Scrim / Overlay -->
+<div class="absolute inset-0 bg-on-background/20 backdrop-blur-sm z-40"></div>
+<!-- Bottom Sheet -->
+<div class="absolute bottom-0 left-0 w-full bg-surface rounded-t-[24px] shadow-[0_-4px_16px_rgba(0,0,0,0.1)] z-50 transform transition-transform duration-300 translate-y-0 pb-safe">
+<!-- Drag Handle -->
+<div class="w-full flex justify-center pt-sm pb-base">
+<div class="w-12 h-1 bg-outline-variant rounded-full"></div>
+</div>
+<div class="px-margin-mobile pb-md pt-xs">
+<div class="flex items-center justify-between mb-sm">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">Edit Class</h2>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+</div>
+<form class="space-y-sm">
+<!-- Subject -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Subject</label>
+<div class="relative">
+<div class="absolute left-sm top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-primary z-10 pointer-events-none"></div>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-[12px] pl-[32px] pr-sm py-[10px] font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary appearance-none">
+<option>Mathematics 101</option>
+<option>Physics 202</option>
+<option>Literature 303</option>
+<option>Computer Science 404</option>
+</select>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+</div>
+</div><div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Short name</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-[12px] px-sm py-[10px] font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary" placeholder="e.g. DBMS" type="text"/>
+</div>
+<p class="text-[11px] text-on-surface-variant opacity-70 mt-xs">Shown on your timetable and class cards</p>
+</div>
+<!-- Day Selector -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Day</label>
+<div class="flex items-center justify-between gap-xs">
+<button class="flex-1 bg-primary text-on-primary py-[6px] rounded-[12px] font-label-sm text-[11px] font-medium transition-colors" type="button">Mon</button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container py-[6px] rounded-[12px] font-label-sm text-[11px] font-medium transition-colors" type="button">Tue</button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container py-[6px] rounded-[12px] font-label-sm text-[11px] font-medium transition-colors" type="button">Wed</button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container py-[6px] rounded-[12px] font-label-sm text-[11px] font-medium transition-colors" type="button">Thu</button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container py-[6px] rounded-[12px] font-label-sm text-[11px] font-medium transition-colors" type="button">Fri</button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container py-[6px] rounded-[12px] font-label-sm text-[11px] font-medium transition-colors" type="button">Sat</button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container py-[6px] rounded-[12px] font-label-sm text-[11px] font-medium transition-colors" type="button">Sun</button>
+</div>
+</div>
+<!-- Time Row -->
+<div class="grid grid-cols-2 gap-md">
+<!-- Start Time -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Start Time</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-[12px] pl-sm pr-[36px] py-[10px] font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary appearance-none" type="text" value="09:00 AM"/>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] pointer-events-none">schedule</span>
+</div>
+</div>
+<!-- End Time -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">End Time</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-[12px] pl-sm pr-[36px] py-[10px] font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary appearance-none" type="text" value="10:30 AM"/>
+<span class="material-symbols-outlined absolute right-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] pointer-events-none">schedule</span>
+</div>
+</div>
+</div>
+<!-- Room -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Room</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] pointer-events-none">location_on</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-[12px] pl-[36px] pr-sm py-[10px] font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Room / location" type="text" value="Room 302"/>
+</div>
+</div>
+</form>
+<hr class="border-outline-variant my-md"/>
+<div class="flex flex-col gap-sm">
+<button class="font-label-sm text-label-sm text-error hover:text-on-error-container transition-colors flex items-center gap-xs self-start bg-transparent border-0 p-0">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+                    Delete Class
+                </button>
+<div class="hidden bg-error-container text-on-error-container p-sm rounded-[12px] flex items-center justify-between text-[13px]">
+<span>Remove Mathematics 101 on Monday?</span>
+<div class="flex gap-sm font-medium">
+<button class="hover:underline">Cancel</button>
+<button class="text-error font-bold hover:underline">Delete</button>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container font-label-sm text-label-sm px-md py-[14px] rounded-full transition-colors flex items-center justify-center gap-sm mt-xs">
+                    Save Changes
+                </button>
+</div>
+</div>
+</div>
+</body></html>

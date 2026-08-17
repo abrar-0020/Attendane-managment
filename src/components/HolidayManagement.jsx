@@ -14,19 +14,12 @@ export default function HolidayManagement({ onClose }) {
   const handleSave = (e) => {
     e.preventDefault();
     if (!form.date || !form.name) return alert("Date and name required");
-    
     const existing = holidays.find(h => h.date === form.date);
-    if (existing) {
-      if(!window.confirm("Holiday already exists on this date. Overwrite?")) return;
-    }
-    
-    const newList = existing 
+    if (existing && !window.confirm("Holiday already exists on this date. Overwrite?")) return;
+    const newList = existing
       ? holidays.map(h => h.date === form.date ? form : h)
       : [...holidays, form];
-      
-    // Sort by date
-    newList.sort((a,b) => new Date(a.date) - new Date(b.date));
-    
+    newList.sort((a, b) => new Date(a.date) - new Date(b.date));
     storage.saveHolidays(newList);
     setHolidays(newList);
     setIsAdding(false);
@@ -42,54 +35,79 @@ export default function HolidayManagement({ onClose }) {
   };
 
   return createPortal(
-    <div className="fullscreen-portal mng-portal">
-      <div className="portal-header">
-        <button className="back-btn" onClick={onClose}>← Back</button>
-        <h2>Manage Holidays</h2>
-      </div>
+    <div className="tmng-portal">
+      {/* Header */}
+      <header className="tmng-header">
+        <div className="tmng-header-inner">
+          <button className="tmng-back-btn" onClick={isAdding ? () => setIsAdding(false) : onClose}>
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h2 className="tmng-title">{isAdding ? 'Add Holiday' : 'Manage Holidays'}</h2>
+          {!isAdding ? (
+            <button className="tmng-add-btn" onClick={() => setIsAdding(true)}>
+              <span className="material-symbols-outlined">add</span>
+            </button>
+          ) : (
+            <div style={{ width: 40 }} />
+          )}
+        </div>
+      </header>
 
-      <div className="portal-content">
-        {!isAdding ? (
-          <>
-            <button className="add-fab" onClick={() => setIsAdding(true)}>+ Add Holiday</button>
-            
-            {holidays.length === 0 ? (
-               <div className="empty-state">No holidays added yet.</div>
-            ) : (
-              <div className="class-list">
-                {holidays.map(h => (
-                  <div key={h.date} className="list-item">
-                    <div className="list-info">
-                      <span className="badge">{new Date(h.date).toLocaleDateString()}</span>
-                      <h4>{h.name}</h4>
+      {!isAdding ? (
+        <div className="tmng-content">
+          {holidays.length === 0 ? (
+            <div className="tmng-empty">
+              <span className="material-symbols-outlined tmng-empty-icon">beach_access</span>
+              <p className="tmng-empty-text">No holidays added yet.</p>
+              <span className="tmng-empty-sub">Tap + to add a holiday or break</span>
+            </div>
+          ) : (
+            <div className="tmng-day-cards">
+              {holidays.map(h => (
+                <div key={h.date} className="tmng-class-card">
+                  <div className="tmng-card-edge" style={{ background: 'var(--secondary)' }} />
+                  <div className="tmng-card-body">
+                    <div className="tmng-card-top">
+                      <span className="tmng-card-time">
+                        <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>event</span>
+                        {new Date(h.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                      <button className="tmng-del-btn" onClick={() => handleDelete(h.date)}>
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
                     </div>
-                    <button className="del-btn" onClick={() => handleDelete(h.date)}>🗑️</button>
+                    <h4 className="tmng-card-subject">{h.name}</h4>
                   </div>
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <form className="add-form" onSubmit={handleSave}>
-            <h3>Add New Holiday</h3>
-            
-            <div className="form-group">
-              <label>Date</label>
-              <input type="date" required value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
+                </div>
+              ))}
             </div>
-
-            <div className="form-group">
-              <label>Holiday Name</label>
-              <input required placeholder="e.g. Diwali" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
-            </div>
-
-            <div className="form-actions">
-              <button type="button" className="cancel-btn" onClick={() => setIsAdding(false)}>Cancel</button>
-              <button type="submit" className="save-btn">Save</button>
-            </div>
-          </form>
-        )}
-      </div>
+          )}
+        </div>
+      ) : (
+        <form className="tmng-form" onSubmit={handleSave}>
+          <div className="tmng-field">
+            <label className="tmng-label">Date *</label>
+            <input
+              className="tmng-input"
+              type="date"
+              required
+              value={form.date}
+              onChange={e => setForm({ ...form, date: e.target.value })}
+            />
+          </div>
+          <div className="tmng-field">
+            <label className="tmng-label">Holiday Name *</label>
+            <input
+              className="tmng-input"
+              required
+              placeholder="e.g. Diwali, Republic Day"
+              value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })}
+            />
+          </div>
+          <button type="submit" className="tmng-save-btn">Save Holiday</button>
+        </form>
+      )}
     </div>,
     document.body
   );

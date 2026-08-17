@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - AttendMe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#126d27",
+                        "secondary-fixed": "#9ff79f",
+                        "on-error": "#ffffff",
+                        "surface": "#f8f9fa",
+                        "on-secondary-fixed": "#002105",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#005318",
+                        "on-surface": "#191c1d",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#f8f6ff",
+                        "tertiary-container": "#ce3b3b",
+                        "on-background": "#191c1d",
+                        "on-tertiary-container": "#fff5f4",
+                        "background": "#f8f9fa",
+                        "inverse-primary": "#bac3ff",
+                        "tertiary-fixed-dim": "#ffb3ae",
+                        "surface-container-high": "#e7e8e9",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "inverse-on-surface": "#f0f1f2",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-surface-variant": "#454651",
+                        "secondary-fixed-dim": "#83da85",
+                        "on-primary-fixed": "#00105b",
+                        "outline": "#767683",
+                        "secondary-container": "#9cf49c",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c6c5d3",
+                        "primary-fixed-dim": "#bac3ff",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-secondary-container": "#19722b",
+                        "primary-container": "#5c6bc0",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#910816",
+                        "surface-container": "#edeeef",
+                        "on-tertiary-fixed": "#410004",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#4352a5",
+                        "surface-bright": "#f8f9fa",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#2f3f92",
+                        "tertiary": "#ab2126",
+                        "surface-tint": "#4858ab",
+                        "surface-dim": "#d9dadb",
+                        "primary-fixed": "#dee0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "margin-desktop": "48px",
+                        "lg": "40px",
+                        "sm": "12px",
+                        "margin-mobile": "16px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "md": "24px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "title-md": ["Manrope", "sans-serif"],
+                        "headline-lg": ["Manrope", "sans-serif"],
+                        "body-md": ["Manrope", "sans-serif"],
+                        "headline-lg-mobile": ["Manrope", "sans-serif"],
+                        "display-metric": ["Manrope", "sans-serif"],
+                        "label-sm": ["Manrope", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-metric": ["48px", { "lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen pb-safe">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim w-full top-0 sticky z-40 transition-colors">
+<div class="flex items-center justify-between px-margin-mobile h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden shrink-0">
+<img alt="Student Profile Photo" class="w-full h-full object-cover" data-alt="A professional headshot of a student against a clean, modern soft indigo background. The lighting is bright and evenly distributed, casting soft shadows that define the facial features subtly. The style is modern corporate photography, fitting for a premium educational platform, maintaining a calm and organized aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFAEVCM_xcgNdXRKmDDqN3b_wPy7-uoHnDKMx43wdGL9Fm7mftnm-Ll-6qR7L_LA90mCy4AuLVvrxbcLMDrI0AkGVyftSw2NkCWpJzAktGxrlido9iuKRRvEDjMC2Q-hcAkRccTb87AKZhwPjK9D1sKssMxi-Gm4PlssrC3n4cfOQ4iBDPLWBHHTTVFz3wYrWyZ5KNryln_-GTfjVeKAVqSwxOPvI127DzXvRLoPkGzmVvtEg1Cip7zA"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">AttendMe</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-surface-container dark:hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-100">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</div>
+</header>
+<main class="w-full max-w-3xl mx-auto px-margin-mobile md:px-margin-desktop py-lg pb-32">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg mb-lg">Settings</h2>
+<!-- Settings Groups -->
+<div class="space-y-lg">
+<!-- Group: Profile -->
+<section>
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-sm px-4">Profile</h3>
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors text-left active:bg-surface-container">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">person</span>
+<span class="font-body-md text-body-md">Edit Profile</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Group: Preferences -->
+<section>
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-sm px-4">Preferences</h3>
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
+<div class="flex items-center justify-between p-4 border-b border-surface-variant">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">target</span>
+<span class="font-body-md text-body-md">Attendance Goal</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md text-primary">90%</span>
+<span class="material-symbols-outlined text-outline-variant text-sm">edit</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 border-b border-surface-variant">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">dark_mode</span>
+<span class="font-body-md text-body-md">Dark Theme</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors text-left active:bg-surface-container">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">notifications_active</span>
+<span class="font-body-md text-body-md">Notifications</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Group: Data -->
+<section>
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-sm px-4">Data</h3>
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors text-left active:bg-surface-container">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline">download</span>
+<span class="font-body-md text-body-md">Export Data</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface-container-low dark:bg-surface-container-lowest fixed bottom-0 w-full z-50 rounded-t-xl shadow-[0_-4px_16px_rgba(0,0,0,0.04)] pb-safe">
+<div class="flex justify-around items-center h-20 px-4">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-5 py-1 hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 rounded-full transition-all active:scale-90 duration-200 ease-out">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-5 py-1 hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 rounded-full transition-all active:scale-90 duration-200 ease-out">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">insights</span>
+<span class="font-label-sm text-label-sm">Stats</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-5 py-1 hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 rounded-full transition-all active:scale-90 duration-200 ease-out">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-on-secondary-container text-on-secondary-container dark:text-secondary-fixed rounded-full px-5 py-1 hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 transition-all active:scale-90 duration-200 ease-out">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-sm text-label-sm">Settings</span>
+</button>
+</div>
+</nav>
+</body></html>

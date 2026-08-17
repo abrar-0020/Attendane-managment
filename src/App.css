@@ -1,10 +1,12 @@
+/* ===== APP CONTAINER ===== */
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100%;
   overflow: hidden;
   position: relative;
+  background-color: var(--surface);
 }
 
 .main-content {
@@ -15,21 +17,24 @@
   position: relative;
 }
 
+/* ===== BOTTOM NAVIGATION (Material 3) ===== */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 70px;
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-top: 1px solid rgba(255, 255, 255, 0.45);
+  height: 80px;
+  background: var(--surface-container-low);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+  border-radius: 16px 16px 0 0;
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom);
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .nav-item {
@@ -37,28 +42,43 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #64748b;
-  text-decoration: none;
-  font-size: 0.75rem;
-  font-weight: 500;
   gap: 4px;
-  padding: 8px 16px;
-  transition: color 0.2s ease;
-  cursor: pointer;
+  padding: 4px 20px;
   border: none;
   background: transparent;
+  cursor: pointer;
+  color: var(--on-surface-variant);
+  font-family: 'Manrope', sans-serif;
+  font-size: var(--font-label-sm-size);
+  font-weight: var(--font-label-sm-weight);
+  line-height: var(--font-label-sm-line-height);
+  letter-spacing: var(--font-label-sm-letter-spacing);
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease-out;
+  position: relative;
+}
+
+.nav-item:active {
+  transform: scale(0.90);
 }
 
 .nav-item.active {
-  color: var(--primary);
+  background: var(--secondary-container);
+  color: var(--on-secondary-container);
 }
 
-.nav-icon {
-  font-size: 1.5rem;
+.nav-item .material-symbols-outlined {
+  font-size: 24px;
+  transition: font-variation-settings 0.2s ease;
 }
 
+.nav-item.active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ===== PAGE TRANSITIONS ===== */
 .page-transition-enter {
-  animation-duration: 320ms;
+  animation-duration: 300ms;
   animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   animation-fill-mode: forwards;
 }
@@ -72,54 +92,67 @@
 }
 
 @keyframes slideInFromRight {
-  from { opacity: 0; transform: translateX(40px); }
+  from { opacity: 0; transform: translateX(32px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInFromLeft {
-  from { opacity: 0; transform: translateX(-40px); }
+  from { opacity: 0; transform: translateX(-32px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes slideInPage {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
-}
-
+/* ===== FULLSCREEN PORTAL (modal pages) ===== */
 .fullscreen-portal {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  background: #f8fafc;
-  animation: slideInPage 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 200;
+  background: var(--surface);
+  animation: slideUpPortal 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   overflow-y: auto;
   overflow-x: hidden;
 }
 
+@keyframes slideUpPortal {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* ===== UPDATE TOAST ===== */
 .update-toast {
   position: fixed;
   top: 16px;
   left: 16px;
   right: 16px;
   background: var(--primary);
-  color: white;
+  color: var(--on-primary);
   padding: 12px 16px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(244, 63, 94, 0.4);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px rgba(67, 82, 165, 0.35);
   z-index: 2000;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: 'Manrope', sans-serif;
+  font-size: var(--font-label-sm-size);
+  font-weight: var(--font-label-sm-weight);
   animation: dropInToast 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .update-toast button {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
   cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+  font-size: var(--font-label-sm-size);
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.update-toast button:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 @keyframes dropInToast {

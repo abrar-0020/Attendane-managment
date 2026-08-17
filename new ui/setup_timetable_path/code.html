@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Timetable Entry Path - AttendMe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2e3132",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4858ab",
+                        "tertiary": "#ab2126",
+                        "tertiary-fixed-dim": "#ffb3ae",
+                        "primary": "#4352a5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#bac3ff",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-container": "#f8f6ff",
+                        "on-surface-variant": "#454651",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#bac3ff",
+                        "on-secondary-container": "#19722b",
+                        "primary-fixed": "#dee0ff",
+                        "background": "#f8f9fa",
+                        "tertiary-container": "#ce3b3b",
+                        "on-tertiary-fixed": "#410004",
+                        "secondary-fixed": "#9ff79f",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline-variant": "#c6c5d3",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed-variant": "#005318",
+                        "surface-variant": "#e1e3e4",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-container": "#fff5f4",
+                        "secondary": "#126d27",
+                        "surface-container-low": "#f3f4f5",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#002105",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#767683",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#910816",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface": "#f8f9fa",
+                        "on-primary-fixed": "#00105b",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-background": "#191c1d",
+                        "primary-container": "#5c6bc0",
+                        "secondary-fixed-dim": "#83da85",
+                        "secondary-container": "#9cf49c",
+                        "on-primary-fixed-variant": "#2f3f92",
+                        "surface-container-high": "#e7e8e9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "margin-desktop": "48px",
+                        "md": "24px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["manrope"],
+                        "title-md": ["manrope"],
+                        "body-md": ["manrope"],
+                        "headline-lg": ["manrope"],
+                        "headline-lg-mobile": ["manrope"],
+                        "display-metric": ["manrope"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-metric": ["48px", { "lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(67, 82, 165, 0.15);
+            background-color: theme('colors.surface-container-lowest');
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation AppBar - Suppressed for transactional flow as per guidelines -->
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col items-center justify-center p-margin-mobile md:p-margin-desktop w-full max-w-4xl mx-auto">
+<!-- Progress Indicators -->
+<div aria-label="Progress: Step 1 of 3" class="flex items-center gap-2 mb-xl">
+<div aria-current="step" class="w-8 h-2 rounded-full bg-primary"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+</div>
+<!-- Header Section -->
+<header class="text-center mb-xl w-full max-w-2xl">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-sm">
+                How would you like to build your timetable?
+            </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Set up your academic schedule manually or import one shared by a peer.
+            </p>
+</header>
+<!-- Selection Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter w-full max-w-3xl">
+<!-- Card A: Start Fresh -->
+<button aria-label="Start fresh - Build it myself" class="card-hover group relative flex flex-col items-center justify-center p-xl bg-surface-container rounded-xl border border-transparent hover:border-primary/20 text-center w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+<div class="mb-lg w-20 h-20 rounded-full bg-primary-container/20 group-hover:bg-primary-container/30 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="calendar_add_on">calendar_add_on</span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mb-xs">Start fresh</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Build it myself</span>
+<!-- Subtle indicator -->
+<div class="absolute bottom-md right-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</button>
+<!-- Card B: Import Shared -->
+<button aria-label="Copy from a classmate - Import a shared timetable" class="card-hover group relative flex flex-col items-center justify-center p-xl bg-surface-container rounded-xl border border-transparent hover:border-primary/20 text-center w-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+<div class="mb-lg w-20 h-20 rounded-full bg-primary-container/20 group-hover:bg-primary-container/30 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="share">share</span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mb-xs">Copy from a classmate</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Import a shared timetable</span>
+<!-- Subtle indicator -->
+<div class="absolute bottom-md right-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</button>
+</div>
+<!-- Back/Cancel Action -->
+<div class="mt-xl">
+<button class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors py-sm px-md rounded-full hover:bg-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary">
+                Cancel setup
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar - Suppressed for transactional flow as per guidelines -->
+</body></html>

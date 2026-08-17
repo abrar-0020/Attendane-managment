@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import DateSelector from './DateSelector';
-import ClassCard from './ClassCard';
 import { storage } from '../services/storage';
 import { timetableService } from '../services/timetable';
 import { dateUtils } from '../utils/dateUtils';
+import ClassCard from './ClassCard';
 import './TimetableView.css';
 
 export default function TimetableView() {
@@ -11,13 +10,6 @@ export default function TimetableView() {
   const [classes, setClasses] = useState([]);
   const [records, setRecords] = useState([]);
   const [holiday, setHoliday] = useState(null);
-  const [profile, setProfile] = useState({ name: 'Student' });
-  const [startDate, setStartDate] = useState('');
-
-  useEffect(() => {
-    setProfile(storage.getProfile() || { name: 'Student' });
-    setStartDate(storage.getStartDate());
-  }, []);
 
   const loadDataForDate = (dateStr) => {
     setHoliday(timetableService.getHolidayForDate(dateStr));
@@ -31,72 +23,159 @@ export default function TimetableView() {
 
   const handleUpdateStatus = (subject, hour, status) => {
     storage.addRecord({ date: selectedDate, subject, hour, status });
-    // Reload local records to re-render
     setRecords(storage.getRecords().filter(r => r.date === selectedDate));
   };
 
-  const getGreeting = () => {
-    const hr = new Date().getHours();
-    if (hr < 12) return 'Good morning';
-    if (hr < 17) return 'Good afternoon';
-    return 'Good evening';
+  const navigateDay = (direction) => {
+    const current = dateUtils.parseDate(selectedDate);
+    current.setDate(current.getDate() + direction);
+    setSelectedDate(dateUtils.formatDate(current));
   };
 
-  const isSunday = dateUtils.getDayName(new Date(selectedDate)) === 'Sunday';
+  const getDayName = () => {
+    const d = dateUtils.parseDate(selectedDate);
+    return d.toLocaleDateString('en-US', { weekday: 'long' });
+  };
+
+  const getDateLabel = () => {
+    const d = dateUtils.parseDate(selectedDate);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const isToday = selectedDate === dateUtils.formatDate(new Date());
+  const isSunday = dateUtils.getDayName(dateUtils.parseDate(selectedDate)) === 'Sunday';
 
   return (
     <div className="timetable-view">
-      <div className="header-section">
-        <h1 className="greeting">{getGreeting()}, {profile.name.split(' ')[0]}</h1>
-        <p className="subtitle">Here is your schedule.</p>
-      </div>
+      {/* Top App Bar */}
+      <header className="tv-header">
+        <div className="tv-header-inner">
+          <button className="tv-profile-btn">
+            <span className="material-symbols-outlined text-[24px]">account_circle</span>
+          </button>
+          <h1 className="tv-app-title">AttendMe</h1>
+          <button className="tv-notif-btn">
+            <span className="material-symbols-outlined">notifications</span>
+            <span className="tv-notif-dot"></span>
+          </button>
+        </div>
+      </header>
 
-      <div className="selector-wrapper">
-        {startDate && <DateSelector 
-          startDateStr={startDate} 
-          selectedDateStr={selectedDate} 
-          onSelectDate={setSelectedDate} 
-        />}
-      </div>
-
-      <div className="classes-container">
-        {holiday && (
-          <div className="holiday-banner">
-            <h3>🎉 Holiday</h3>
-            <p>{holiday.name}</p>
+      <main className="tv-main">
+        {/* Day Selector */}
+        <section className="tv-day-selector-section">
+          <div className="tv-day-selector">
+            <button
+              className="tv-day-nav-btn"
+              aria-label="Previous Day"
+              onClick={() => navigateDay(-1)}
+            >
+              <span className="material-symbols-outlined">chevron_left</span>
+            </button>
+            <div className="tv-day-center">
+              <h2 className="tv-day-name">{getDayName()}</h2>
+              <span className="tv-date-label">{getDateLabel()}</span>
+            </div>
+            <button
+              className="tv-day-nav-btn"
+              aria-label="Next Day"
+              onClick={() => navigateDay(1)}
+            >
+              <span className="material-symbols-outlined">chevron_right</span>
+            </button>
           </div>
-        )}
-
-        {!holiday && isSunday && (
-          <div className="empty-state">
-            <div className="empty-icon">☕</div>
-            <p>No classes on Sunday.</p>
-            <span>Enjoy your weekend!</span>
+          {/* Dots */}
+          <div className="tv-dots">
+            <div className="tv-dot active" />
+            <div className="tv-dot" />
+            <div className="tv-dot" />
+            <div className="tv-dot" />
+            <div className="tv-dot" />
           </div>
-        )}
+        </section>
 
-        {!holiday && !isSunday && classes.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-icon">🏖️</div>
-            <p>No classes scheduled for today.</p>
-            <span>You're all clear!</span>
-          </div>
-        )}
+        {/* Classes List */}
+        <section className="tv-classes-section">
+          {holiday && (
+            <div className="tv-holiday-banner">
+              <span className="material-symbols-outlined tv-holiday-icon">celebration</span>
+              <div>
+                <h3 className="tv-holiday-title">Holiday</h3>
+                <p className="tv-holiday-name">{holiday.name}</p>
+              </div>
+            </div>
+          )}
 
-        {!holiday && !isSunday && classes.map((cls, idx) => {
-          const rec = records.find(r => r.hour === cls.hour && r.subject === cls.subject);
-          const status = rec ? rec.status : 'unmarked';
-          
-          return (
-            <ClassCard 
-              key={`${cls.subject}-${cls.hour}-${idx}`}
-              cls={cls}
-              status={status}
-              onUpdateStatus={handleUpdateStatus}
-            />
-          );
-        })}
-      </div>
+          {!holiday && isSunday && (
+            <div className="tv-empty-state">
+              <span className="material-symbols-outlined tv-empty-icon">weekend</span>
+              <p className="tv-empty-title">No classes on Sunday.</p>
+              <span className="tv-empty-sub">Enjoy your weekend!</span>
+            </div>
+          )}
+
+          {!holiday && !isSunday && classes.length === 0 && (
+            <div className="tv-empty-state">
+              <span className="material-symbols-outlined tv-empty-icon">beach_access</span>
+              <p className="tv-empty-title">No classes today.</p>
+              <span className="tv-empty-sub">You're all clear!</span>
+            </div>
+          )}
+
+          {!holiday && !isSunday && classes.map((cls, idx) => {
+            const rec = records.find(r => r.hour === cls.hour && r.subject === cls.subject);
+            const status = rec ? rec.status : 'unmarked';
+            
+            // Edge color based on status
+            let edgeClass = 'primary';
+            if (status === 'present') edgeClass = 'secondary';
+            if (status === 'absent') edgeClass = 'error';
+
+            // Check if this class is just before the 12:35 - 01:35 PM lunch break
+            // and if there is a subsequent class after the break.
+            // We can determine this by checking if the next class's start time or hour is after lunch.
+            // To simplify, we check if the current class ends before/at 12:40 PM and the next class is after 1:30 PM.
+            let showLunchBreak = false;
+            const nextCls = classes[idx + 1];
+            if (nextCls) {
+              // A simple heuristic: if this class hour is before lunch (e.g. Hour 4 usually ends around 12:35)
+              // and the next class hour is after lunch (e.g. Hour 5 starts around 13:35).
+              // We'll check the string "12:35" or just hardcode if there's a gap.
+              // Assuming standard timetable strings like "11:45–12:35" or "12:45"
+              const thisEnd = cls.endtime ? cls.endtime.replace(/\s*[A-Z]+/i, '').trim() : '';
+              const nextStart = nextCls.starttime ? nextCls.starttime.replace(/\s*[A-Z]+/i, '').trim() : '';
+              
+              if (thisEnd.includes('12:35') || thisEnd.includes('12:45') || cls.hour === 4) {
+                 if (nextCls.hour > cls.hour) {
+                    showLunchBreak = true;
+                 }
+              }
+            }
+
+            return (
+              <div key={`${cls.subject}-${cls.hour}-${idx}`}>
+                <ClassCard
+                  cls={cls}
+                  status={status}
+                  edgeColor={edgeClass}
+                  onUpdateStatus={handleUpdateStatus}
+                />
+                
+                {showLunchBreak && (
+                   <div className="tv-lunch-break">
+                     <div className="tv-lunch-line"></div>
+                     <div className="tv-lunch-text">
+                       <span className="material-symbols-outlined">restaurant</span>
+                       <span>Lunch Break (12:35 PM - 01:35 PM)</span>
+                     </div>
+                     <div className="tv-lunch-line"></div>
+                   </div>
+                )}
+              </div>
+            );
+          })}
+        </section>
+      </main>
     </div>
   );
 }

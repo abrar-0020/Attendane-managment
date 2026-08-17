@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Share Timetable</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2e3132",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4858ab",
+                        "tertiary": "#ab2126",
+                        "tertiary-fixed-dim": "#ffb3ae",
+                        "primary": "#4352a5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#bac3ff",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-container": "#f8f6ff",
+                        "on-surface-variant": "#454651",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#bac3ff",
+                        "on-secondary-container": "#19722b",
+                        "primary-fixed": "#dee0ff",
+                        "background": "#f8f9fa",
+                        "tertiary-container": "#ce3b3b",
+                        "on-tertiary-fixed": "#410004",
+                        "secondary-fixed": "#9ff79f",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline-variant": "#c6c5d3",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed-variant": "#005318",
+                        "surface-variant": "#e1e3e4",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-container": "#fff5f4",
+                        "secondary": "#126d27",
+                        "surface-container-low": "#f3f4f5",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#002105",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "outline": "#767683",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#910816",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface": "#f8f9fa",
+                        "on-primary-fixed": "#00105b",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-background": "#191c1d",
+                        "primary-container": "#5c6bc0",
+                        "secondary-fixed-dim": "#83da85",
+                        "secondary-container": "#9cf49c",
+                        "on-primary-fixed-variant": "#2f3f92",
+                        "surface-container-high": "#e7e8e9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "xl": "64px",
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "margin-desktop": "48px",
+                        "md": "24px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Manrope", "sans-serif"],
+                        "title-md": ["Manrope", "sans-serif"],
+                        "body-md": ["Manrope", "sans-serif"],
+                        "headline-lg": ["Manrope", "sans-serif"],
+                        "headline-lg-mobile": ["Manrope", "sans-serif"],
+                        "display-metric": ["Manrope", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-metric": ["48px", { "lineHeight": "56px", "letterSpacing": "-1px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .fill-icon { font-variation-settings: 'FILL' 1; }
+        /* Hide scrollbar for clean UI */
+        ::-webkit-scrollbar { display: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased overflow-hidden">
+<!-- BACKGROUND APPLICATION STATE (Blurred) -->
+<div class="relative min-h-screen w-full flex flex-col blur-[3px] scale-[0.98] transition-all duration-300 select-none pointer-events-none">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim w-full top-0 sticky z-40">
+<div class="flex items-center justify-between px-margin-mobile h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-sm">
+<img class="w-8 h-8 rounded-full object-cover bg-surface-container-high border border-outline-variant/20" data-alt="A small circular avatar placeholder showing a friendly student's face with a soft, bright background, designed to fit cleanly into a modern corporate minimal top navigation bar without borders." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAV7773DbMFFwT6f5p5DQdSgdTyqDolmXSivyQjaKApXNZPNn6HeDWq3RfNPthpcoaXEndDWdcgS0jNHoPSBW0DWU4Rut0EJzQvbJZi8uLHvU3-hQjC99c9pteeAkMIzaq4ScO5hDaKziS97OX9oWaRfePDmFA26CzgXIachHlFGiY6t3MvWDct9ssJnuisFWQnZfxFgl9ktf4osrE-FDyl7ZmZcsM89Lrf-8ibttA8_vPGXu3ap4Zkfg"/>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim tracking-tight">AttendMe</span>
+</div>
+<button class="hover:bg-surface-container dark:hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-100 p-2 text-on-surface-variant dark:text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Dummy Calendar Main Content -->
+<main class="flex-1 px-margin-mobile py-md max-w-7xl w-full mx-auto flex flex-col gap-md">
+<div class="w-full flex justify-between items-end mb-sm">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface">This Week</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Oct 24 - 30</p>
+</div>
+<button class="bg-primary/10 text-primary font-label-sm text-label-sm px-4 py-2 rounded-full font-semibold">Today</button>
+</div>
+<div class="bg-surface-container-low rounded-xl p-md flex flex-col gap-sm border border-outline-variant/10">
+<div class="w-16 h-4 bg-outline-variant/20 rounded-full"></div>
+<div class="w-3/4 h-8 bg-surface-container-highest rounded-lg"></div>
+<div class="w-1/2 h-4 bg-outline-variant/10 rounded-full"></div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-md flex flex-col gap-sm border border-outline-variant/10">
+<div class="w-16 h-4 bg-outline-variant/20 rounded-full"></div>
+<div class="w-full h-8 bg-surface-container-highest rounded-lg"></div>
+<div class="w-2/3 h-4 bg-outline-variant/10 rounded-full"></div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface-container-low dark:bg-surface-container-lowest shadow-[0_-4px_16px_rgba(0,0,0,0.04)] fixed bottom-0 w-full z-50 rounded-t-xl">
+<div class="fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-safe">
+<!-- Inactive Home -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-5 py-1 hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 rounded-full transition-all active:scale-90 duration-200 ease-out">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</button>
+<!-- Inactive Stats -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-5 py-1 hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 rounded-full transition-all active:scale-90 duration-200 ease-out">
+<span class="material-symbols-outlined text-[24px]">insights</span>
+<span class="font-label-sm text-label-sm mt-1">Stats</span>
+</button>
+<!-- Active Calendar -->
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-on-secondary-container text-on-secondary-container dark:text-secondary-fixed rounded-full px-5 py-1 hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 transition-all active:scale-90 duration-200 ease-out">
+<span class="material-symbols-outlined text-[24px] fill-icon">calendar_today</span>
+<span class="font-label-sm text-label-sm mt-1 font-bold">Calendar</span>
+</button>
+<!-- Inactive Settings -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-5 py-1 hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 rounded-full transition-all active:scale-90 duration-200 ease-out">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="font-label-sm text-label-sm mt-1">Settings</span>
+</button>
+</div>
+</nav>
+</div>
+<!-- MODAL OVERLAY (Scrim) -->
+<div class="fixed inset-0 z-[100] bg-on-surface/40 backdrop-blur-[1px] transition-opacity duration-300"></div>
+<!-- BOTTOM SHEET -->
+<div class="fixed bottom-0 left-0 right-0 z-[110] flex justify-center pb-safe">
+<div class="bg-surface w-full max-w-md rounded-t-[28px] p-md pt-sm shadow-[0_-8px_32px_rgba(0,0,0,0.15)] flex flex-col items-center gap-md transform translate-y-0 transition-transform duration-300 ease-out border border-surface-container-high border-b-0">
+<!-- Drag Handle -->
+<div class="w-12 h-[5px] bg-outline-variant/40 rounded-full mb-xs"></div>
+<!-- Header -->
+<h2 class="font-title-md text-title-md text-on-surface w-full text-center">Share your timetable</h2>
+<!-- Share Code Display -->
+<div class="w-full bg-surface-container-low rounded-[20px] p-md flex flex-col items-center justify-center gap-xs border border-surface-container-highest">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.1em]">Share Code</span>
+<span class="font-display-metric text-display-metric text-primary tracking-wider mt-1">AM-7X29K</span>
+</div>
+<!-- Primary Action -->
+<button class="w-full bg-primary text-on-primary font-title-md text-title-md py-4 rounded-full flex items-center justify-center gap-sm active:scale-[0.98] transition-transform shadow-sm hover:shadow-md">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+                Copy code
+            </button>
+<!-- Divider -->
+<div class="w-full flex items-center gap-sm my-1">
+<div class="flex-1 h-px bg-surface-container-highest"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant px-2">or share via</span>
+<div class="flex-1 h-px bg-surface-container-highest"></div>
+</div>
+<!-- OS Native Share Row Simulation -->
+<div class="w-full flex justify-between items-center px-2 pb-sm">
+<button class="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface group-hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[28px]">chat</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Messages</span>
+</button>
+<button class="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface group-hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[28px]">mail</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mail</span>
+</button>
+<button class="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface group-hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[28px]">qr_code_scanner</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">QR Code</span>
+</button>
+<button class="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface group-hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[28px]">more_horiz</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">More</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

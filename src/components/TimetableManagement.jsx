@@ -15,175 +15,255 @@ const DEFAULT_TIMES = {
   8: { start: '16:25', end: '17:20' }
 };
 
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAY_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 export default function TimetableManagement({ onClose }) {
   const [classes, setClasses] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
-  const [suggestion, setSuggestion] = useState({ day: 'Monday', hour: 1 });
-  
+  const [editingClass, setEditingClass] = useState(null); // { cls, idx }
   const [form, setForm] = useState({
-    day: 'Monday',
-    hour: 1,
-    starttime: '',
-    endtime: '',
-    subject: '',
-    room: '',
-    startDate: ''
+    day: 'Monday', hour: 1, starttime: '08:50', endtime: '09:45', subject: '', room: '', startDate: ''
   });
 
-  useEffect(() => {
-    loadClasses();
-  }, []);
+  useEffect(() => { loadClasses(); }, []);
 
   const loadClasses = () => {
     const data = storage.getTimetable();
     setClasses(data);
     const nextSlot = timetableService.suggestNextSlot();
-    setSuggestion(nextSlot);
-    setForm({
-      ...form, 
-      day: nextSlot.day, 
-      hour: nextSlot.hour,
+    setForm(f => ({
+      ...f, day: nextSlot.day, hour: nextSlot.hour,
       starttime: DEFAULT_TIMES[nextSlot.hour]?.start || '',
       endtime: DEFAULT_TIMES[nextSlot.hour]?.end || ''
-    });
+    }));
   };
 
   const handleHourChange = (e) => {
     const hr = parseInt(e.target.value);
-    setForm({
-      ...form,
-      hour: hr,
-      starttime: DEFAULT_TIMES[hr]?.start || '',
-      endtime: DEFAULT_TIMES[hr]?.end || ''
-    });
+    setForm(f => ({ ...f, hour: hr, starttime: DEFAULT_TIMES[hr]?.start || '', endtime: DEFAULT_TIMES[hr]?.end || '' }));
   };
+
+  const handleDaySelect = (day) => setForm(f => ({ ...f, day }));
 
   const handleSave = (e) => {
     e.preventDefault();
     if (!form.subject) return alert("Subject required");
-    
-    // Check if slot already exists
     const existingIdx = classes.findIndex(c => c.day === form.day && c.hour === form.hour);
     let newClasses = [...classes];
-    
     if (existingIdx > -1) {
       if (!window.confirm("Class already exists for this day and hour. Overwrite?")) return;
       newClasses[existingIdx] = form;
     } else {
       newClasses.push(form);
     }
-    
     storage.saveTimetable(newClasses);
     loadClasses();
     setIsAdding(false);
-    
-    // Suggest next naturally
-    const hrs = parseInt(form.hour) + 1;
-    setForm(prev => ({
-      ...prev, 
-      subject: '', 
-      hour: hrs <= 8 ? hrs : 1,
-      starttime: DEFAULT_TIMES[hrs <= 8 ? hrs : 1]?.start || '',
-      endtime: DEFAULT_TIMES[hrs <= 8 ? hrs : 1]?.end || ''
-    }));
+    setEditingClass(null);
   };
 
   const handleDelete = (cls) => {
-    if (window.confirm(`Delete ${cls.subject} on ${cls.day} Hr ${cls.hour}?`)) {
+    if (window.confirm(`Delete ${cls.subject} on ${cls.day}?`)) {
       const newClasses = classes.filter(c => !(c.day === cls.day && c.hour === cls.hour));
       storage.saveTimetable(newClasses);
       loadClasses();
     }
   };
 
-  const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const openEdit = (cls) => {
+    setForm({ ...cls });
+    setEditingClass(cls);
+    setIsAdding(true);
+  };
+
   const sortedClasses = [...classes].sort((a, b) => {
     if (a.day === b.day) return a.hour - b.hour;
-    return daysOrder.indexOf(a.day) - daysOrder.indexOf(b.day);
+    return DAYS.indexOf(a.day) - DAYS.indexOf(b.day);
   });
 
+  // Group by day
+  const grouped = DAYS.reduce((acc, day) => {
+    const dayCls = sortedClasses.filter(c => c.day === day);
+    if (dayCls.length > 0) acc[day] = dayCls;
+    return acc;
+  }, {});
+
   return createPortal(
-    <div className="fullscreen-portal mng-portal">
-      <div className="portal-header">
-        <button className="back-btn" onClick={onClose}>← Back</button>
-        <h2>Manage Timetable</h2>
-      </div>
+    <div className="tmng-portal">
+      {/* Header */}
+      <header className="tmng-header">
+        <div className="tmng-header-inner">
+          <button className="tmng-back-btn" onClick={isAdding ? () => { setIsAdding(false); setEditingClass(null); } : onClose}>
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h2 className="tmng-title">{isAdding ? (editingClass ? 'Edit Class' : 'Add Class') : 'Manage Classes'}</h2>
+          {!isAdding && (
+            <button className="tmng-add-btn" onClick={() => setIsAdding(true)}>
+              <span className="material-symbols-outlined">add</span>
+            </button>
+          )}
+          {isAdding && <div style={{ width: 40 }} />}
+        </div>
+      </header>
 
-      <div className="portal-content">
-        {!isAdding ? (
-          <>
-            <button className="add-fab" onClick={() => setIsAdding(true)}>+ Add Class</button>
-            
-            {sortedClasses.length === 0 ? (
-               <div className="empty-state">No classes scheduled.</div>
-            ) : (
-              <div className="class-list">
-                {sortedClasses.map((cls, idx) => (
-                  <div key={`${cls.day}-${cls.hour}-${idx}`} className="list-item">
-                    <div className="list-info">
-                      <span className="badge">{cls.day.substr(0,3)} • Hr {cls.hour}</span>
-                      <h4>{cls.subject}</h4>
-                      <p>{cls.starttime} - {cls.endtime} • {cls.room}</p>
+      {/* Content */}
+      {!isAdding ? (
+        <div className="tmng-content">
+          {sortedClasses.length === 0 ? (
+            <div className="tmng-empty">
+              <span className="material-symbols-outlined tmng-empty-icon">calendar_month</span>
+              <p className="tmng-empty-text">No classes yet.</p>
+              <span className="tmng-empty-sub">Tap + to add your first class</span>
+            </div>
+          ) : (
+            Object.entries(grouped).map(([day, dayCls]) => (
+              <div key={day} className="tmng-day-group">
+                <h3 className="tmng-day-label">{day}</h3>
+                <div className="tmng-day-cards">
+                  {dayCls.map((cls, idx) => (
+                    <div key={`${cls.day}-${cls.hour}`} className="tmng-class-card">
+                      <div className="tmng-card-edge" />
+                      <div className="tmng-card-body">
+                        <div className="tmng-card-top">
+                          <span className="tmng-card-time">
+                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>schedule</span>
+                            {cls.starttime}–{cls.endtime}
+                          </span>
+                          <div className="tmng-card-actions">
+                            <button className="tmng-edit-btn" onClick={() => openEdit(cls)}>
+                              <span className="material-symbols-outlined">edit</span>
+                            </button>
+                            <button className="tmng-del-btn" onClick={() => handleDelete(cls)}>
+                              <span className="material-symbols-outlined">delete</span>
+                            </button>
+                          </div>
+                        </div>
+                        <h4 className="tmng-card-subject">{cls.subject}</h4>
+                        {cls.room && (
+                          <div className="tmng-card-room">
+                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>location_on</span>
+                            {cls.room}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <button className="del-btn" onClick={() => handleDelete(cls)}>🗑️</button>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <form className="tmng-form" onSubmit={handleSave}>
+          {/* Subject */}
+          <div className="tmng-field">
+            <label className="tmng-label">Subject Name</label>
+            <input
+              className="tmng-input"
+              required
+              placeholder="e.g. CS301 – Data Structures"
+              value={form.subject}
+              onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+            />
+          </div>
+
+          {/* Day chips */}
+          <div className="tmng-field">
+            <label className="tmng-label">Day</label>
+            <div className="tmng-day-chips">
+              {DAYS.map(day => (
+                <button
+                  key={day}
+                  type="button"
+                  className={`tmng-day-chip ${form.day === day ? 'active' : ''}`}
+                  onClick={() => handleDaySelect(day)}
+                >
+                  {day.slice(0, 3)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Hour */}
+          <div className="tmng-field">
+            <label className="tmng-label">Hour</label>
+            <div className="tmng-select-wrap">
+              <select className="tmng-select" value={form.hour} onChange={handleHourChange}>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(h => (
+                  <option key={h} value={h}>Hour {h}</option>
                 ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <form className="add-form" onSubmit={handleSave}>
-            <h3>Add New Class</h3>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label>Day</label>
-                <select value={form.day} onChange={e => setForm({...form, day: e.target.value})}>
-                  {daysOrder.map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label>Hour</label>
-                <select value={form.hour} onChange={handleHourChange}>
-                   {[1,2,3,4,5,6,7,8].map(h => <option key={h} value={h}>{h}</option>)}
-                </select>
+              </select>
+            </div>
+          </div>
+
+          {/* Times */}
+          <div className="tmng-row-2">
+            <div className="tmng-field">
+              <label className="tmng-label">Start Time</label>
+              <div className="tmng-input-icon-wrap">
+                <span className="material-symbols-outlined tmng-input-icon">schedule</span>
+                <input
+                  className="tmng-input tmng-input-with-icon"
+                  type="time"
+                  required
+                  value={form.starttime}
+                  onChange={e => setForm(f => ({ ...f, starttime: e.target.value }))}
+                />
               </div>
             </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Start Time</label>
-                <input type="time" required value={form.starttime} onChange={e => setForm({...form, starttime: e.target.value})} />
+            <div className="tmng-field">
+              <label className="tmng-label">End Time</label>
+              <div className="tmng-input-icon-wrap">
+                <span className="material-symbols-outlined tmng-input-icon">schedule</span>
+                <input
+                  className="tmng-input tmng-input-with-icon"
+                  type="time"
+                  required
+                  value={form.endtime}
+                  onChange={e => setForm(f => ({ ...f, endtime: e.target.value }))}
+                />
               </div>
-              <div className="form-group">
-                <label>End Time</label>
-                <input type="time" required value={form.endtime} onChange={e => setForm({...form, endtime: e.target.value})} />
-              </div>
             </div>
+          </div>
 
-            <div className="form-group">
-              <label>Subject Code/Name</label>
-              <input required placeholder="e.g. CS301" value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} />
+          {/* Room */}
+          <div className="tmng-field">
+            <label className="tmng-label">Room / Location</label>
+            <div className="tmng-input-icon-wrap">
+              <span className="material-symbols-outlined tmng-input-icon">location_on</span>
+              <input
+                className="tmng-input tmng-input-with-icon"
+                placeholder="Room / location"
+                value={form.room}
+                onChange={e => setForm(f => ({ ...f, room: e.target.value }))}
+              />
             </div>
+          </div>
 
-            <div className="form-group">
-              <label>Room</label>
-              <input placeholder="e.g. A101" value={form.room} onChange={e => setForm({...form, room: e.target.value})} />
-            </div>
+          {/* Start Date */}
+          <div className="tmng-field">
+            <label className="tmng-label">Class Start Date (optional)</label>
+            <input
+              className="tmng-input"
+              type="date"
+              value={form.startDate}
+              onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
+            />
+          </div>
 
-            <div className="form-group">
-              <label>Start Date (Optional)</label>
-              <input type="date" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} />
-            </div>
+          {editingClass && (
+            <button type="button" className="tmng-delete-inline" onClick={() => { handleDelete(editingClass); setIsAdding(false); }}>
+              <span className="material-symbols-outlined">delete</span>
+              Delete Class
+            </button>
+          )}
 
-            <div className="form-actions">
-              <button type="button" className="cancel-btn" onClick={() => setIsAdding(false)}>Cancel</button>
-              <button type="submit" className="save-btn">Save Class</button>
-            </div>
-          </form>
-        )}
-      </div>
+          <button type="submit" className="tmng-save-btn">
+            {editingClass ? 'Save Changes' : 'Add Class'}
+          </button>
+        </form>
+      )}
     </div>,
     document.body
   );

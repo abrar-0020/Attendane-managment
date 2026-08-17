@@ -14,9 +14,34 @@ const getObj = (key) => JSON.parse(localStorage.getItem(key) || 'null');
 const setVal = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
 export const storage = {
-  // Timetable
   getTimetable: () => getArray(STORAGE_KEYS.TIMETABLE),
   saveTimetable: (data) => setVal(STORAGE_KEYS.TIMETABLE, data),
+
+  importTimetableData: (newClasses, newProfile) => {
+    if (newProfile && (newProfile.name || newProfile.studentId)) {
+      const current = storage.getProfile() || {};
+      storage.saveProfile({ ...current, ...newProfile });
+    }
+
+    const currentClasses = storage.getTimetable();
+    const merged = [...currentClasses];
+    
+    newClasses.forEach(nc => {
+      // Uniqueness rule: Day + Hour + Subject
+      const exists = merged.some(ec => 
+        ec.day === nc.day && 
+        ec.hour === nc.hour && 
+        ec.subject === nc.subject &&
+        ec.starttime === nc.starttime &&
+        ec.endtime === nc.endtime
+      );
+      if (!exists) {
+        merged.push(nc);
+      }
+    });
+
+    storage.saveTimetable(merged);
+  },
 
   // Records
   getRecords: () => getArray(STORAGE_KEYS.RECORDS),
