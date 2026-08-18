@@ -161,7 +161,7 @@ export default function TimetableView() {
                      <div className="tv-lunch-line"></div>
                      <div className="tv-lunch-text">
                        <span className="material-symbols-outlined">restaurant</span>
-                       <span>Lunch Break (12:35 PM - 01:35 PM)</span>
+                       <span>Lunch Break (12:35 PM - 01:25 PM)</span>
                      </div>
                      <div className="tv-lunch-line"></div>
                    </div>
