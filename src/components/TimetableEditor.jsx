@@ -15,8 +15,10 @@ export default function TimetableEditor() {
   const [activeModal, setActiveModal] = useState(null);
   const [notifPrefs, setNotifPrefs] = useState(() => storage.getNotificationPrefs());
 
-  const profile = storage.getProfile() || {};
+  const [profile, setProfile] = useState(() => storage.getProfile() || {});
   const [theme, setTheme] = useState(() => storage.getTheme());
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editProfileData, setEditProfileData] = useState({ name: '', roll: '', section: '' });
 
   useEffect(() => {
     storage.saveStartDate(startDate);
@@ -82,6 +84,21 @@ export default function TimetableEditor() {
     }
   };
 
+  const handleEditProfile = () => {
+    setEditProfileData({ name: profile.name || '', roll: profile.roll || '', section: profile.section || '' });
+    setIsEditingProfile(true);
+  };
+
+  const handleSaveProfile = () => {
+    if (!editProfileData.name.trim()) {
+      alert("Name is required");
+      return;
+    }
+    storage.saveProfile(editProfileData);
+    setProfile(editProfileData);
+    setIsEditingProfile(false);
+  };
+
   const handleToggleTheme = (e) => {
     const newTheme = e.target.checked ? 'dark' : 'light';
     setTheme(newTheme);
@@ -100,16 +117,28 @@ export default function TimetableEditor() {
         <section className="set-section">
           <h3 className="set-section-label">Profile</h3>
           <div className="set-card">
-            <div className="set-profile-row">
-              <div className="set-profile-avatar">
-                {profile.name ? profile.name[0].toUpperCase() : 'S'}
+            {isEditingProfile ? (
+              <div className="set-profile-edit">
+                <input className="set-input" placeholder="Full Name" value={editProfileData.name} onChange={e => setEditProfileData({...editProfileData, name: e.target.value})} />
+                <input className="set-input" placeholder="Roll Number (optional)" value={editProfileData.roll} onChange={e => setEditProfileData({...editProfileData, roll: e.target.value})} />
+                <input className="set-input" placeholder="Section (optional)" value={editProfileData.section} onChange={e => setEditProfileData({...editProfileData, section: e.target.value})} />
+                <div className="set-profile-actions">
+                  <button className="set-btn-cancel" onClick={() => setIsEditingProfile(false)}>Cancel</button>
+                  <button className="set-btn-save" onClick={handleSaveProfile}>Save</button>
+                </div>
               </div>
-              <div className="set-profile-info">
-                <span className="set-profile-name">{profile.name || 'Student'}</span>
-                {profile.roll && <span className="set-profile-sub">{profile.roll}{profile.section ? ` · Section ${profile.section}` : ''}</span>}
+            ) : (
+              <div className="set-profile-row" onClick={handleEditProfile} style={{ cursor: 'pointer' }}>
+                <div className="set-profile-avatar">
+                  {profile.name ? profile.name[0].toUpperCase() : 'S'}
+                </div>
+                <div className="set-profile-info">
+                  <span className="set-profile-name">{profile.name || 'Student'}</span>
+                  {profile.roll && <span className="set-profile-sub">{profile.roll}{profile.section ? ` · Section ${profile.section}` : ''}</span>}
+                </div>
+                <span className="material-symbols-outlined set-profile-arrow">edit</span>
               </div>
-              <span className="material-symbols-outlined set-profile-arrow">chevron_right</span>
-            </div>
+            )}
           </div>
         </section>
 

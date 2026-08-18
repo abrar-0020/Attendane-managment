@@ -142,6 +142,63 @@
   font-size: 20px !important;
 }
 
+.set-profile-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+}
+
+.set-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--outline-variant);
+  background: var(--surface);
+  color: var(--on-surface);
+  font-size: var(--font-body-md-size);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.set-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-container);
+}
+
+.set-profile-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  justify-content: flex-end;
+}
+
+.set-btn-cancel,
+.set-btn-save {
+  padding: 10px 20px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-label-md-size);
+  font-weight: var(--font-label-md-weight);
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.set-btn-cancel {
+  background: transparent;
+  color: var(--on-surface-variant);
+}
+
+.set-btn-save {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.set-btn-cancel:hover,
+.set-btn-save:hover {
+  opacity: 0.8;
+}
+
 /* Rows */
 .set-row {
   display: flex;
