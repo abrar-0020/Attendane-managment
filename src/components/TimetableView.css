@@ -49,9 +49,9 @@
 
 .tv-app-title {
   font-family: var(--font-headline-lg-mobile);
-  font-size: var(--text-headline-lg-mobile);
-  font-weight: 700;
-  color: var(--primary);
+  font-size: var(--font-headline-lg-mobile-size);
+  font-weight: var(--font-headline-lg-mobile-weight);
+  color: var(--on-surface);
   margin: 0;
 }
 
