@@ -39,7 +39,7 @@
 
 .cc-body {
   flex-grow: 1;
-  padding: 24px 24px 24px 40px; /* 40px left padding to clear edge */
+  padding: 16px 16px 16px 24px; /* Reduced padding for smaller height */
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -117,7 +117,7 @@
 .cc-actions {
   display: flex;
   align-items: center;
-  padding-right: 24px;
+  padding-right: 16px;
   position: relative;
 }
 
