@@ -77,13 +77,14 @@ export default function TimetableView() {
               <span className="material-symbols-outlined">chevron_right</span>
             </button>
           </div>
-          {/* Dots */}
+          {/* Dots indicating Day of Week (Mon-Fri) */}
           <div className="tv-dots">
-            <div className="tv-dot active" />
-            <div className="tv-dot" />
-            <div className="tv-dot" />
-            <div className="tv-dot" />
-            <div className="tv-dot" />
+            {[0, 1, 2, 3, 4].map(idx => {
+              const currentDayIndex = dateUtils.parseDate(selectedDate).getDay() - 1;
+              return (
+                <div key={idx} className={`tv-dot ${currentDayIndex === idx ? 'active' : ''}`} />
+              );
+            })}
           </div>
         </section>
 
