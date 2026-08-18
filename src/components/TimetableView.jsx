@@ -132,17 +132,18 @@ export default function TimetableView() {
             let showLunchBreak = false;
             const nextCls = classes[idx + 1];
             if (nextCls) {
-              // A simple heuristic: if this class hour is before lunch (e.g. Hour 4 usually ends around 12:35)
-              // and the next class hour is after lunch (e.g. Hour 5 starts around 13:35).
-              // We'll check the string "12:35" or just hardcode if there's a gap.
-              // Assuming standard timetable strings like "11:45–12:35" or "12:45"
-              const thisEnd = cls.endtime ? cls.endtime.replace(/\s*[A-Z]+/i, '').trim() : '';
-              const nextStart = nextCls.starttime ? nextCls.starttime.replace(/\s*[A-Z]+/i, '').trim() : '';
+              const currentHourNum = Number(cls.hour);
+              const nextHourNum = Number(nextCls.hour);
               
-              if (thisEnd.includes('12:35') || thisEnd.includes('12:40') || thisEnd.includes('12:45') || String(cls.hour) === '4') {
-                 if (Number(nextCls.hour) > Number(cls.hour)) {
+              if (!isNaN(currentHourNum) && !isNaN(nextHourNum)) {
+                 if (currentHourNum <= 4 && nextHourNum >= 5) {
                     showLunchBreak = true;
                  }
+              } else {
+                const thisEnd = cls.endtime ? cls.endtime.replace(/\s*[A-Z]+/i, '').trim() : '';
+                if (thisEnd.includes('12:35') || thisEnd.includes('12:40') || thisEnd.includes('12:45')) {
+                   showLunchBreak = true;
+                }
               }
             }
 
