@@ -16,6 +16,7 @@ export default function TimetableEditor() {
   const [notifPrefs, setNotifPrefs] = useState(() => storage.getNotificationPrefs());
 
   const profile = storage.getProfile() || {};
+  const [theme, setTheme] = useState(() => storage.getTheme());
 
   useEffect(() => {
     storage.saveStartDate(startDate);
@@ -81,6 +82,13 @@ export default function TimetableEditor() {
     }
   };
 
+  const handleToggleTheme = (e) => {
+    const newTheme = e.target.checked ? 'dark' : 'light';
+    setTheme(newTheme);
+    storage.saveTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
   return (
     <div className="settings-view">
 
@@ -101,6 +109,26 @@ export default function TimetableEditor() {
                 {profile.roll && <span className="set-profile-sub">{profile.roll}{profile.section ? ` · Section ${profile.section}` : ''}</span>}
               </div>
               <span className="material-symbols-outlined set-profile-arrow">chevron_right</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Appearance */}
+        <section className="set-section">
+          <h3 className="set-section-label">Appearance</h3>
+          <div className="set-card">
+            <div className="set-toggle-row">
+              <div className="set-row-left">
+                <span className="material-symbols-outlined set-row-icon">dark_mode</span>
+                <div>
+                  <span className="set-row-title">Dark Mode</span>
+                  <span className="set-row-sub">Use a darker theme</span>
+                </div>
+              </div>
+              <label className="set-toggle">
+                <input type="checkbox" checked={theme === 'dark'} onChange={handleToggleTheme} />
+                <span className="set-toggle-track" />
+              </label>
             </div>
           </div>
         </section>

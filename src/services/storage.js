@@ -6,7 +6,8 @@ export const STORAGE_KEYS = {
   PROFILE: 'attendance_user_profile',
   BASE_COUNTS: 'attendance_base_counts',
   NOTIFICATIONS: 'attendance_notification_prefs',
-  NOTIFIED_VERSION: 'app_notified_version'
+  NOTIFIED_VERSION: 'app_notified_version',
+  THEME: 'attendance_theme'
 };
 
 const getArray = (key) => JSON.parse(localStorage.getItem(key) || '[]');
@@ -114,6 +115,10 @@ export const storage = {
   // App Version
   getNotifiedVersion: () => localStorage.getItem(STORAGE_KEYS.NOTIFIED_VERSION),
   saveNotifiedVersion: (version) => localStorage.setItem(STORAGE_KEYS.NOTIFIED_VERSION, version),
+
+  // Theme
+  getTheme: () => localStorage.getItem(STORAGE_KEYS.THEME) || 'light',
+  saveTheme: (theme) => localStorage.setItem(STORAGE_KEYS.THEME, theme),
 
   // Clear all
   clearAll: () => {

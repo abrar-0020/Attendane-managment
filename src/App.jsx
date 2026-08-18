@@ -23,6 +23,8 @@ export default function App() {
   const [showUpdateToast, setShowUpdateToast] = useState(false);
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', storage.getTheme());
+
     const params = new URLSearchParams(window.location.search);
     let shareQuery = params.get('share');
     

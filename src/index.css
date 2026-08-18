@@ -116,8 +116,7 @@
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+[data-theme='dark'] {
     /* Primary - Soft Indigo */
     --primary: #bac3ff;
     --on-primary: #0f2175;
@@ -181,7 +180,6 @@
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.8);
-  }
 }
 
 /* ===== BASE RESET ===== */
