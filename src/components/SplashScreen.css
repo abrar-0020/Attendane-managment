@@ -23,20 +23,19 @@
 }
 
 .splash-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 22px;
-  background: var(--primary);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--primary-container);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(67, 82, 165, 0.3);
   margin-bottom: var(--space-sm);
 }
 
 .splash-icon-symbol {
-  font-size: 40px;
-  color: var(--on-primary);
+  font-size: 48px;
+  color: var(--on-primary-container);
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
 }
 

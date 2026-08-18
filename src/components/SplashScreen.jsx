@@ -5,7 +5,7 @@ export default function SplashScreen() {
     <div className="splash-screen">
       <div className="splash-content">
         <div className="splash-icon">
-          <span className="material-symbols-outlined splash-icon-symbol">calendar_today</span>
+          <span className="material-symbols-outlined splash-icon-symbol">fact_check</span>
         </div>
         <h1 className="splash-title">AttendMe</h1>
         <p className="splash-tagline">Track. Know. Stay Safe.</p>
