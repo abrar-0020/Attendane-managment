@@ -8,6 +8,7 @@ import HolidayManagement from './HolidayManagement';
 import ShareTimetable from './ShareTimetable';
 import TextImportModal from './TextImportModal';
 import QRScannerModal from './QRScannerModal';
+import AboutModal from './AboutModal';
 import './TimetableEditor.css';
 
 export default function TimetableEditor() {
@@ -325,6 +326,21 @@ export default function TimetableEditor() {
           </div>
         </section>
 
+        {/* About Section */}
+        <section className="set-section">
+          <h3 className="set-section-label">About</h3>
+          <div className="set-card set-card-list">
+            <button className="set-list-item" onClick={() => openModal('about')}>
+              <span className="material-symbols-outlined set-row-icon">info</span>
+              <div className="set-item-text">
+                <span className="set-row-title">About AttendMe</span>
+                <span className="set-row-sub">Version, Developer info</span>
+              </div>
+              <span className="material-symbols-outlined set-chevron">chevron_right</span>
+            </button>
+          </div>
+        </section>
+
         {/* Danger Zone */}
         <section className="set-section">
           <div className="set-card">
@@ -341,6 +357,7 @@ export default function TimetableEditor() {
       {activeModal === 'share' && <ShareTimetable onClose={closeModal} />}
       {activeModal === 'textImport' && <TextImportModal onClose={closeModal} />}
       {activeModal === 'qrScanner' && <QRScannerModal onClose={closeModal} />}
+      {activeModal === 'about' && <AboutModal onClose={closeModal} />}
     </div>
   );
 }
