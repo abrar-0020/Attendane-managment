@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   background-color: var(--surface);
-  z-index: 100;
+  z-index: 200;
   overflow: hidden;
   color: var(--on-surface);
   animation: slideInBottom 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -51,7 +51,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   overflow: hidden;
 }
 
