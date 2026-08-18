@@ -27,7 +27,7 @@ export default function AboutModal({ onClose }) {
               <span className="am-badge">v1.0.0</span>
             </div>
             
-            <p className="am-app-desc" style={{ color: 'var(--on-surface-variant)', fontSize: '14px', lineHeight: '1.5', margin: '0 0 24px 0', padding: '0 8px' }}>
+            <p className="am-app-desc" style={{ color: 'var(--on-surface-variant)', fontSize: '14px', lineHeight: '1.5', margin: '0 auto 16px', padding: '0 8px', textAlign: 'center', maxWidth: '90%' }}>
               AttendMe is a streamlined, privacy-first attendance management tool designed to help students track their academic schedules effortlessly. All data is securely stored locally on your device.
             </p>
             
