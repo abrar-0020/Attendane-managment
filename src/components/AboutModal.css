@@ -70,7 +70,7 @@
 .am-logo-container {
   width: 100px;
   height: 100px;
-  background-color: #004d40;
+  background-color: var(--primary-container);
   border-radius: 50%;
   margin: 0 auto 16px;
   display: flex;
@@ -79,7 +79,7 @@
 }
 
 .am-logo-char {
-  color: #80cbc4;
+  color: var(--on-primary-container);
   font-size: 48px;
   font-weight: bold;
   line-height: 1;
@@ -99,8 +99,8 @@
 }
 
 .am-badge {
-  background-color: #263238;
-  color: #80cbc4;
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
   padding: 6px 16px;
   border-radius: 9999px;
   font-size: 14px;
@@ -142,7 +142,7 @@
 }
 
 .am-icon-accent {
-  color: #80cbc4;
+  color: var(--primary);
   font-size: 18px;
 }
 
@@ -213,18 +213,18 @@
 .am-social-btn {
   width: 44px;
   height: 44px;
-  background-color: #263238;
-  color: var(--on-surface);
+  background-color: var(--surface-container-high);
+  color: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  transition: opacity 0.2s;
+  transition: background-color 0.2s;
 }
 
 .am-social-btn:hover {
-  opacity: 0.8;
+  background-color: var(--surface-container-highest);
 }
 
 .am-social-btn .material-symbols-outlined {
