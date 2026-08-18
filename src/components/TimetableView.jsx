@@ -50,11 +50,7 @@ export default function TimetableView() {
       {/* Top App Bar */}
       <header className="tv-header">
         <div className="tv-header-inner">
-          <button className="tv-profile-btn">
-            <span className="material-symbols-outlined text-[24px]">account_circle</span>
-          </button>
-          <h1 className="tv-app-title">AttendMe</h1>
-
+          <h1 className="tv-app-title">Timetable</h1>
         </div>
       </header>
 

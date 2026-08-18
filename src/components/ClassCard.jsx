@@ -29,9 +29,6 @@ export default function ClassCard({ cls, status, edgeColor, onUpdateStatus }) {
       <div className="cc-body">
         <div className="cc-header">
           <h3 className={`cc-subject ${isCancelled ? 'line-through' : ''}`}>
-            {cls.subjectName && cls.subjectName !== cls.subject && (
-              <span className="cc-subject-code">{cls.subject}</span>
-            )}
             <span className="cc-subject-name">{cls.subjectName || cls.subject}</span>
           </h3>
           {isCancelled && (
