@@ -238,6 +238,13 @@
   font-weight: 500;
   color: var(--on-surface);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.set-row-left > div {
+  flex: 1;
+  min-width: 0;
 }
 
 .set-row-sub {
@@ -245,6 +252,9 @@
   font-size: var(--font-label-sm-size);
   font-weight: var(--font-label-sm-weight);
   color: var(--on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* List item buttons */
