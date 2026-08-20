@@ -24,13 +24,14 @@ export default defineConfig({
   server: {
     proxy: {
       // During local development, forward /linways-api/* to the university portal.
-      // This avoids CORS issues without touching any credentials on any server.
-      // In production the app must be served from a CORS-allowed origin or behind a proxy.
+      // cookieDomainRewrite rewrites the Set-Cookie domain from linways.com → localhost
+      // so the browser actually stores and re-sends session cookies through the proxy.
       '/linways-api': {
         target: 'https://presidencyuniversity.linways.com',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/linways-api/, ''),
+        cookieDomainRewrite: 'localhost',
       },
     },
   },

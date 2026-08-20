@@ -145,45 +145,70 @@ export const linwaysSync = {
 
 /**
  * Authenticate with Linways and return { ok, token, error }.
- * We POST to the login URL and extract the auth token from the response.
+ *
+ * Linways uses a classic web-form login (application/x-www-form-urlencoded),
+ * not a JSON API. After a successful POST the server sets a session cookie
+ * (via Set-Cookie). We use credentials:'include' so the browser stores that
+ * cookie and sends it on subsequent requests through the Vite proxy.
+ *
+ * Some Linways instances also return a JSON body with a JWT — we try to
+ * extract it, but fall back to cookie-based session if no token is found.
  */
 async function _login(username, password) {
   try {
+    // Build a URL-encoded form body exactly like a browser would submit the login form
+    const formBody = new URLSearchParams();
+    formBody.append('username', username);
+    formBody.append('password', password);
+
     const res = await fetch(LOGIN_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-      credentials: 'omit',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formBody.toString(),
+      credentials: 'include', // ← allow session cookies to be received & stored
+      redirect: 'follow',     // follow any redirect after successful login
     });
 
+    // A redirect to a dashboard page means login succeeded
+    // A 200 on the login page itself may mean wrong password (form re-shown)
+    // A 401/403 means explicitly rejected
+    if (res.status === 401 || res.status === 403) {
+      return { ok: false, error: 'Invalid username or password. Please check your credentials.' };
+    }
+
     if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
-        return { ok: false, error: 'Invalid username or password. Please check your credentials.' };
-      }
       return { ok: false, error: `Login failed (HTTP ${res.status}). Please try again.` };
     }
 
-    const data = await res.json();
-
-    // Linways may return token in different fields — try all common ones
-    const token =
-      data?.data?.token ||
-      data?.token ||
-      data?.data?.authToken ||
-      data?.authToken ||
-      data?.data?.jwt ||
-      data?.jwt ||
-      null;
-
-    if (!token) {
-      // Some Linways instances set a cookie-based session — try to proceed without a Bearer token
-      // We'll pass an empty string and let _fetchAttendance use cookies if credentials: 'include'
-      return { ok: true, token: '' };
+    // Try to parse a JSON token from the body (some Linways API variants do this)
+    let token = '';
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      try {
+        const data = await res.json();
+        token =
+          data?.data?.token ||
+          data?.token ||
+          data?.data?.authToken ||
+          data?.authToken ||
+          data?.data?.jwt ||
+          data?.jwt ||
+          '';
+      } catch (_) {
+        token = '';
+      }
     }
-
+    // If no JSON token, rely on the session cookie (credentials:'include' handles this)
     return { ok: true, token };
+
   } catch (err) {
-    return { ok: false, error: 'Cannot reach the university portal. Check your internet connection.' };
+    // fetch() throws only on network errors (no internet, CORS block, bad hostname).
+    // If the proxy is not running (dev server not restarted), this is what you get.
+    const isCors = err instanceof TypeError;
+    const msg = isCors
+      ? 'Cannot reach the university portal. If running locally, please restart the dev server (npm run dev) so the proxy takes effect.'
+      : 'Cannot reach the university portal. Check your internet connection.';
+    return { ok: false, error: msg };
   }
 }
 
