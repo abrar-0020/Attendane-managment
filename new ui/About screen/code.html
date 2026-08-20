@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>About - AttendMe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style data-purpose="theme-config">
+    :root {
+      --font-manrope: 'Manrope', sans-serif;
+      --color-primary: #5c6bc0;
+      --color-surface-dark: #121212;
+      --color-surface-container: #1e1e1e;
+      --color-surface-container-high: #2c2c2c;
+      --color-text-primary: #ffffff;
+      --color-text-secondary: #a0a0a0;
+      --color-icon-bg: #263238; /* Teal-ish dark grey from reference */
+      --color-icon-fg: #80cbc4; /* Teal accent from reference */
+      --border-radius-card: 24px;
+      --border-radius-btn: 12px;
+      --border-radius-pill: 9999px;
+    }
+
+    body {
+      font-family: var(--font-manrope);
+      background-color: var(--color-surface-dark);
+      color: var(--color-text-primary);
+    }
+  </style>
+<style data-purpose="custom-utilities">
+    .bg-surface-container { background-color: var(--color-surface-container); }
+    .bg-surface-high { background-color: var(--color-surface-container-high); }
+    .bg-icon-container { background-color: var(--color-icon-bg); }
+    .text-icon-accent { color: var(--color-icon-fg); }
+    .rounded-card { border-radius: var(--border-radius-card); }
+    .rounded-btn { border-radius: var(--border-radius-btn); }
+    
+    .logo-container {
+      width: 100px;
+      height: 100px;
+      background-color: #004d40; /* Teal background for logo */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+    
+    .logo-char {
+      color: #80cbc4;
+      font-size: 3rem;
+      font-weight: bold;
+      line-height: 1;
+    }
+    
+    .action-button {
+      background-color: transparent;
+      border: 1px solid var(--color-surface-container-high);
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--border-radius-btn);
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    .action-button:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .social-btn {
+      width: 44px;
+      height: 44px;
+      background-color: var(--color-icon-bg);
+      color: var(--color-text-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+  </style>
+</head>
+<body class="antialiased pb-8">
+<!-- BEGIN: TopAppBar -->
+<header class="px-4 py-4 flex items-center justify-between sticky top-0 bg-[#121212] z-10">
+<button aria-label="Go back" class="text-white p-2 focus:outline-none">
+<i class="fa-solid fa-arrow-left text-xl"></i>
+</button>
+<button aria-label="More options" class="text-white p-2 focus:outline-none">
+<i class="fa-solid fa-ellipsis-vertical text-xl"></i>
+</button>
+</header>
+<!-- END: TopAppBar -->
+<main class="px-4 max-w-md mx-auto">
+<!-- BEGIN: PageTitle -->
+<h1 class="text-4xl font-bold mb-6 text-white tracking-tight">About</h1>
+<!-- END: PageTitle -->
+<!-- BEGIN: AppInfoCard -->
+<section class="bg-surface-container rounded-card p-6 mb-8 text-center" data-purpose="app-details">
+<!-- App Logo -->
+<div class="logo-container mb-4">
+<span class="logo-char">ア</span>
+</div>
+<!-- App Name -->
+<h2 class="text-2xl font-bold mb-4">AttendMe</h2>
+<!-- Version Badges -->
+<div class="flex justify-center gap-3 mb-6">
+<span class="bg-icon-container text-icon-accent px-4 py-1.5 rounded-full text-sm font-medium">13.5.0</span>
+<span class="bg-icon-container text-icon-accent px-4 py-1.5 rounded-full text-sm font-medium">ARM64</span>
+</div>
+<!-- Divider -->
+<hr class="border-gray-700 mb-6 w-full opacity-50"/>
+<!-- Action Buttons Grid -->
+<div class="grid grid-cols-2 gap-3">
+<button class="action-button">
+<i class="fa-brands fa-github text-icon-accent text-lg"></i>
+<span>GitHub</span>
+</button>
+<button class="action-button">
+<i class="fa-solid fa-globe text-icon-accent text-lg"></i>
+<span>Website</span>
+</button>
+<button class="action-button">
+<i class="fa-regular fa-paper-plane text-icon-accent text-lg"></i>
+<span>Telegram</span>
+</button>
+<button class="action-button">
+<i class="fa-solid fa-mug-hot text-icon-accent text-lg"></i>
+<span>Donate</span>
+</button>
+</div>
+</section>
+<!-- END: AppInfoCard -->
+<!-- BEGIN: DeveloperSection -->
+<section data-purpose="developer-info">
+<h3 class="text-xs font-bold text-gray-400 tracking-wider mb-3 uppercase pl-2">Lead Developer</h3>
+<div class="bg-surface-container rounded-card p-4 flex items-center gap-4">
+<!-- Avatar -->
+<div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 bg-gray-800 border-2 border-transparent">
+<img alt="Developer Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz7dQDrIFvqnSecOxgYS4QXRFjx6X_JMmotbBmax_8gL3sJLRoPW6Vh6xRMomw7t7aZJfu0djbqBQQ0gic0va_bi8dmEoD7wHlcxFSWYEM3LUxgk4RLI7E6IVY684H5ysiDlbHGrYdbJDualHfzrDRlg4QQJkkhgZjP2kg3AmIvwcFCMUsFN2-4uWSjCgXEXg7HvaQE1hym0q0ucWsjuminjeh6_jtjRa4GfUaW4RWpyKCZazYEQoDqQ"/>
+</div>
+<!-- Dev Info -->
+<div class="flex-grow">
+<h4 class="text-xl font-bold text-white mb-0.5 leading-tight">mo...</h4>
+<p class="text-sm text-gray-400">Eh?</p>
+</div>
+<!-- Social Links -->
+<div class="flex gap-2">
+<a aria-label="GitHub Profile" class="social-btn" href="#">
+<i class="fa-brands fa-github"></i>
+</a>
+<a aria-label="Website" class="social-btn" href="#">
+<i class="fa-solid fa-globe"></i>
+</a>
+<a aria-label="Email" class="social-btn" href="#">
+<i class="fa-solid fa-at"></i>
+</a>
+</div>
+</div>
+</section>
+<!-- END: DeveloperSection -->
+</main>
+</body></html>
