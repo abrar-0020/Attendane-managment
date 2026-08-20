@@ -7,7 +7,8 @@ export const STORAGE_KEYS = {
   BASE_COUNTS: 'attendance_base_counts',
   NOTIFICATIONS: 'attendance_notification_prefs',
   NOTIFIED_VERSION: 'app_notified_version',
-  THEME: 'attendance_theme'
+  THEME: 'attendance_theme',
+  LINWAYS_CONFIG: 'linways_sync_config',
 };
 
 const getArray = (key) => JSON.parse(localStorage.getItem(key) || '[]');
@@ -119,6 +120,11 @@ export const storage = {
   // Theme
   getTheme: () => localStorage.getItem(STORAGE_KEYS.THEME) || 'light',
   saveTheme: (theme) => localStorage.setItem(STORAGE_KEYS.THEME, theme),
+
+  // Linways Portal Sync Config
+  // config shape: { username, password, studentId, autoSync, fromDate, lastSyncedAt }
+  getLinwaysConfig: () => getObj(STORAGE_KEYS.LINWAYS_CONFIG),
+  saveLinwaysConfig: (data) => setVal(STORAGE_KEYS.LINWAYS_CONFIG, data),
 
   // Clear all
   clearAll: () => {

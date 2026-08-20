@@ -19,5 +19,19 @@ export default defineConfig({
       manifest: false, // Use our existing static manifest
       devOptions: { enabled: true }
     })
-  ]
+  ],
+
+  server: {
+    proxy: {
+      // During local development, forward /linways-api/* to the university portal.
+      // This avoids CORS issues without touching any credentials on any server.
+      // In production the app must be served from a CORS-allowed origin or behind a proxy.
+      '/linways-api': {
+        target: 'https://presidencyuniversity.linways.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/linways-api/, ''),
+      },
+    },
+  },
 })

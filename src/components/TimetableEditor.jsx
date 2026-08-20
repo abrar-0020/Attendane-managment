@@ -9,6 +9,7 @@ import ShareTimetable from './ShareTimetable';
 import TextImportModal from './TextImportModal';
 import QRScannerModal from './QRScannerModal';
 import AboutModal from './AboutModal';
+import LinwaysSyncModal from './LinwaysSyncModal';
 import './TimetableEditor.css';
 
 export default function TimetableEditor() {
@@ -304,6 +305,15 @@ export default function TimetableEditor() {
         <section className="set-section">
           <h3 className="set-section-label">Data</h3>
           <div className="set-card set-card-list">
+            <button className="set-list-item" onClick={() => openModal('linwaysSync')}>
+              <span className="material-symbols-outlined set-row-icon">sync</span>
+              <div className="set-item-text">
+                <span className="set-row-title">Linways Portal Sync</span>
+                <span className="set-row-sub">Auto-fetch attendance from university</span>
+              </div>
+              <span className="material-symbols-outlined set-chevron">chevron_right</span>
+            </button>
+            <div className="set-divider" />
             <button className="set-list-item" onClick={() => openModal('textImport')}>
               <span className="material-symbols-outlined set-row-icon">content_paste_go</span>
               <div className="set-item-text">
@@ -358,6 +368,12 @@ export default function TimetableEditor() {
       {activeModal === 'textImport' && <TextImportModal onClose={closeModal} />}
       {activeModal === 'qrScanner' && <QRScannerModal onClose={closeModal} />}
       {activeModal === 'about' && <AboutModal onClose={closeModal} />}
+      {activeModal === 'linwaysSync' && (
+        <LinwaysSyncModal
+          onClose={closeModal}
+          onSyncComplete={() => window.location.reload()}
+        />
+      )}
     </div>
   );
 }

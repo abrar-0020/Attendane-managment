@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { storage } from './services/storage';
+import { linwaysSync } from './services/linwaysSync';
 import SplashScreen from './components/SplashScreen';
 import ProfileSetup from './components/ProfileSetup';
 import HomeView from './components/HomeView';
@@ -42,6 +43,18 @@ export default function App() {
       if (storage.hasProfile()) {
         setAppState('main');
         checkUpdateNotif();
+
+        // ── Linways auto-sync (silent, in the background) ──────────────────
+        // Only triggers if the user has configured and enabled auto-sync.
+        // We intentionally do NOT await or handle errors visibly here;
+        // the sync runs behind the scenes so it never blocks the UI.
+        const cfg = linwaysSync.getConfig();
+        if (cfg && cfg.autoSync !== false) {
+          linwaysSync.sync().catch(() => {
+            // Silently swallow: user will see stale data but no crash.
+          });
+        }
+        // ────────────────────────────────────────────────────────────────────
       } else {
         setAppState('setup');
       }
