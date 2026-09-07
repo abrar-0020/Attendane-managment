@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, ToastAndroid } from 'react-native';
 import Constants from 'expo-constants';
 import { storage } from './storage';
 import { timetableService } from './timetable';
@@ -11,21 +11,19 @@ const isExpoGo = Constants.appOwnership === 'expo';
 
 let Notifications: any = null;
 
-if (!isExpoGo) {
-  try {
-    Notifications = require('expo-notifications');
-    if (Notifications?.setNotificationHandler) {
-      Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-          shouldShowAlert: true,
-          shouldPlaySound: true,
-          shouldSetBadge: false,
-        }),
-      });
-    }
-  } catch (e) {
-    console.warn('[Notifications] expo-notifications not available');
+try {
+  Notifications = require('expo-notifications');
+  if (Notifications?.setNotificationHandler) {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
   }
+} catch (e) {
+  console.warn('[Notifications] expo-notifications not available', e);
 }
 
 export const notificationService = {
@@ -37,7 +35,13 @@ export const notificationService = {
         name: 'Class Reminders',
         importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
+        lightColor: '#4f46e5',
+      });
+      await Notifications.setNotificationChannelAsync('attendance-marks', {
+        name: 'Attendance Updates',
+        importance: Notifications.AndroidImportance.DEFAULT,
+        vibrationPattern: [0, 150],
+        lightColor: '#22c55e',
       });
     }
 
@@ -107,6 +111,42 @@ export const notificationService = {
     }
 
     console.log(`[Notifications] Scheduled ${scheduledCount} class reminder(s) for today`);
+  },
+
+  /**
+   * Fire an immediate local notification when attendance is marked.
+   * @param subject  Subject/course name
+   * @param status   'present' | 'absent'
+   * @param date     Date string e.g. '2026-09-05'
+   */
+  async notifyAttendanceMarked(subject: string, status: 'present' | 'absent', date?: string) {
+    if (!Notifications) return;
+    const granted = await this.requestPermissions();
+    if (!granted) return;
+
+    const isPresent = status === 'present';
+    const emoji = isPresent ? '✅' : '❌';
+    const title = isPresent
+      ? `${emoji} Marked Present`
+      : `${emoji} Marked Absent`;
+    const body = isPresent
+      ? `You've been marked present for ${subject}.`
+      : `You've been marked absent for ${subject}. Keep an eye on your attendance!`;
+
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(body, ToastAndroid.SHORT);
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title,
+        body,
+        sound: true,
+        data: { type: 'attendance-mark', subject, status, date },
+        ...(Platform.OS === 'android' && { channelId: 'attendance-marks' }),
+      },
+      trigger: null, // null means fire immediately
+    });
   },
 
   async cancelAll() {

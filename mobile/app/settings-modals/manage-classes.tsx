@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, TextInput, SafeAreaView, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { Text } from '@/components/Text';
 import { MaterialIcons } from '@expo/vector-icons';
 import { storage } from '../../services/storage';
@@ -37,7 +38,7 @@ export default function ManageClasses() {
   const loadClasses = async () => {
     const data = await storage.getTimetable() || [];
     setClasses(data);
-    const nextSlot = timetableService.suggestNextSlot(data);
+    const nextSlot = await timetableService.suggestNextSlot();
     setForm(f => ({
       ...f, day: nextSlot.day, hour: nextSlot.hour,
       starttime: DEFAULT_TIMES[nextSlot.hour]?.start || '',

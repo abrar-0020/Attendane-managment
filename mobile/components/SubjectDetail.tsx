@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { Text } from '@/components/Text';
 import { MaterialIcons } from '@expo/vector-icons';
 import { storage } from '../services/storage';

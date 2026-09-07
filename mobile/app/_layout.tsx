@@ -1,3 +1,4 @@
+import '../widget-task-handler';
 import { useFonts } from 'expo-font';
 import { 
   Manrope_400Regular,
@@ -5,13 +6,11 @@ import {
   Manrope_600SemiBold,
   Manrope_700Bold
 } from '@expo-google-fonts/manrope';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router/react-navigation';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import { notificationService } from '../services/notifications';
 
 export {
@@ -32,6 +31,7 @@ import { ThemeProvider as CustomThemeProvider } from '../context/ThemeContext';
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     Manrope: Manrope_400Regular,
+    'Manrope-Regular': Manrope_400Regular,
     'Manrope-Medium': Manrope_500Medium,
     'Manrope-SemiBold': Manrope_600SemiBold,
     'Manrope-Bold': Manrope_700Bold,
@@ -45,7 +45,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      // Request notification permissions and schedule today's class reminders
       notificationService.requestPermissions().then(granted => {
         if (granted) {
           notificationService.scheduleClassReminders();
@@ -72,13 +71,10 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="settings-modals/manage-classes" options={{ presentation: 'modal', headerShown: false }} />
-        <Stack.Screen name="settings-modals/manage-holidays" options={{ presentation: 'modal', headerShown: false }} />
-        <Stack.Screen name="settings-modals/linways-sync" options={{ presentation: 'modal', headerShown: false }} />
-        <Stack.Screen name="settings-modals/import-text" options={{ presentation: 'modal', headerShown: false }} />
+        <Stack.Screen name="settings-modals" options={{ presentation: 'modal' }} />
       </Stack>
     </ThemeProvider>
   );

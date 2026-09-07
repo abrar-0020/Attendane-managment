@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build & Cache
+.vite
+
+# Design files
+Mobile Attendance App Design (Community)/

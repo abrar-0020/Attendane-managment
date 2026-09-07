@@ -1,74 +1,83 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Modal } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Modal, FlatList } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text } from '@/components/Text';
-import Svg, { Circle } from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { storage } from '../../services/storage';
+import { useFocusEffect } from 'expo-router';
 import { useThemeContext } from '../../context/ThemeContext';
 import SubjectDetail from '../../components/SubjectDetail';
-import { useFocusEffect } from 'expo-router';
+import { AnimatedFadeIn } from '../../components/AnimatedFadeIn';
 
-export default function StatsView() {
-  const { theme, isDark, toggleTheme } = useThemeContext();
+export default function AnalyticsView() {
+  const { theme } = useThemeContext();
   const styles = makeStyles(theme);
-
-  const [stats, setStats] = useState<any[]>([]);
-  const [overall, setOverall] = useState({ attended: 0, total: 0, percentage: 0 });
-  const [threshold, setThreshold] = useState(75);
+  
+  const [stats, setStats] = useState({ total: 0, present: 0, absent: 0, percentage: 0 });
+  const [subjectStats, setSubjectStats] = useState<any[]>([]);
+  const [timeFilter, setTimeFilter] = useState('This Year');
   const [selectedStat, setSelectedStat] = useState<any>(null);
 
   useFocusEffect(
     useCallback(() => {
-      loadData();
-    }, [])
+      loadStats();
+    }, [timeFilter])
   );
 
-  const loadData = async () => {
-    const prefs = await storage.getNotificationPrefs();
-    setThreshold(prefs.attendanceThreshold || 75);
-    await calculateStats(prefs);
-  };
+  const loadStats = async () => {
+    const timetable = await storage.getTimetable() || [];
+    const allRecords = await storage.getRecords() || [];
+    const baseCounts = await storage.getBaseCounts() || {};
 
-  const calculateStats = async (prefs: any) => {
-    const timetable = await storage.getTimetable();
-    const records = await storage.getRecords();
-    const baseCounts = await storage.getBaseCounts();
+    const now = new Date();
+    let records = allRecords;
+
+    if (timeFilter === 'This Month') {
+      records = allRecords.filter((r: any) => {
+        const d = new Date(r.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      });
+    } else if (timeFilter === 'Last Month') {
+      const lastMonth = new Date();
+      lastMonth.setMonth(now.getMonth() - 1);
+      records = allRecords.filter((r: any) => {
+        const d = new Date(r.date);
+        return d.getMonth() === lastMonth.getMonth() && d.getFullYear() === lastMonth.getFullYear();
+      });
+    } else if (timeFilter === 'This Year') {
+      records = allRecords.filter((r: any) => {
+        const d = new Date(r.date);
+        return d.getFullYear() === now.getFullYear();
+      });
+    }
 
     const subjects = [...new Set(timetable.map((t: any) => t.subject))];
-    let totalAttended = 0;
-    let totalClasses = 0;
+    
+    // 1. Calculate Subject Breakdown (ALWAYS ALL-TIME)
     const statsArray: any[] = [];
-
     subjects.forEach((sub: any) => {
-      const weeklyCount = timetable.filter((t: any) => t.subject === sub).length;
-      const subRecords = records.filter((r: any) => r.subject === sub && r.status !== 'unmarked');
+      const subRecords = allRecords.filter((r: any) => r.subject === sub && r.status !== 'unmarked');
       const presentRecs = subRecords.filter((r: any) => r.status === 'present').length;
       const totalRecs = subRecords.length;
       const baseTotal = baseCounts[sub] ? baseCounts[sub].total : 0;
       const baseAttended = baseCounts[sub] ? baseCounts[sub].attended : 0;
+      
       const overallSubAttended = presentRecs + baseAttended;
       const overallSubTotal = totalRecs + baseTotal;
       
-      totalAttended += overallSubAttended;
-      totalClasses += overallSubTotal;
-
-      let percentage = 0;
       let buffer = 0;
       let needed = 0;
-
+      let percentage = 0;
       if (overallSubTotal > 0) {
         percentage = Math.round((overallSubAttended / overallSubTotal) * 100);
-        if (percentage >= 75) {
-          buffer = Math.floor((overallSubAttended / 0.75) - overallSubTotal);
-        } else {
-          needed = Math.ceil(3 * overallSubTotal - 4 * overallSubAttended);
-        }
+        if (percentage >= 75) buffer = Math.floor((overallSubAttended / 0.75) - overallSubTotal);
+        else needed = Math.ceil(3 * overallSubTotal - 4 * overallSubAttended);
       }
-
+      
       statsArray.push({
         subject: sub,
-        subjectName: timetable.find((t: any) => t.subject === sub)?.subjectName || sub,
-        weeklyCount,
+        name: timetable.find((t: any) => t.subject === sub)?.subjectName || sub,
         attended: overallSubAttended,
         total: overallSubTotal,
         percentage,
@@ -78,313 +87,205 @@ export default function StatsView() {
     });
 
     statsArray.sort((a, b) => a.percentage - b.percentage);
-    setStats(statsArray);
-    const overallPct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 0;
-    setOverall({ attended: totalAttended, total: totalClasses, percentage: overallPct });
+    setSubjectStats(statsArray);
+
+    // 2. Calculate Top Summary Stats (AFFECTED BY TIME FILTER)
+    let totalAttended = 0;
+    let totalClasses = 0;
+    
+    subjects.forEach((sub: any) => {
+      const subRecords = records.filter((r: any) => r.subject === sub && r.status !== 'unmarked');
+      const presentRecs = subRecords.filter((r: any) => r.status === 'present').length;
+      const totalRecs = subRecords.length;
+      
+      const includeBase = timeFilter === 'This Year' || timeFilter === 'All Time';
+      const baseTotal = includeBase && baseCounts[sub] ? baseCounts[sub].total : 0;
+      const baseAttended = includeBase && baseCounts[sub] ? baseCounts[sub].attended : 0;
+      
+      totalAttended += presentRecs + baseAttended;
+      totalClasses += totalRecs + baseTotal;
+    });
+
+    const percentage = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 0;
+    setStats({ 
+      total: totalClasses, 
+      present: totalAttended, 
+      absent: totalClasses - totalAttended, 
+      percentage 
+    });
   };
 
-  const getStatusColor = (pct: number) => {
-    if (pct >= threshold) return '#1a6627'; // dark green like web app
-    if (pct >= threshold - 10) return '#b45309';
-    return theme.colors.error;
+  const FilterPill = ({ label }: { label: string }) => {
+    const isActive = timeFilter === label;
+    return (
+      <TouchableOpacity 
+        style={[styles.filterPill, isActive && { backgroundColor: theme.colors.primary, borderWidth: 0 }]}
+        onPress={() => setTimeFilter(label)}
+      >
+        <Text style={[styles.filterPillText, isActive && { color: 'white' }]}>{label}</Text>
+      </TouchableOpacity>
+    );
   };
 
-  const RADIUS = 56;
-  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-  const dashOffset = CIRCUMFERENCE - (overall.percentage / 100) * CIRCUMFERENCE;
+  const renderHeader = () => (
+    <>
+      <AnimatedFadeIn delay={0}>
+        <Text style={styles.pageTitle}>Analytics</Text>
+      </AnimatedFadeIn>
+
+      <AnimatedFadeIn delay={50}>
+        <View style={styles.filterRow}>
+          <FilterPill label="This Year" />
+          <FilterPill label="This Month" />
+          <FilterPill label="Last Month" />
+          <FilterPill label="All Time" />
+        </View>
+      </AnimatedFadeIn>
+
+      <AnimatedFadeIn delay={100}>
+        <View style={styles.cardsGrid}>
+          {/* Total Classes */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardLabel}>Total Classes</Text>
+              <MaterialIcons name="calendar-today" size={16} color={theme.colors.primary} />
+            </View>
+            <Text style={[styles.cardValue, { color: theme.colors.onSurface }]}>{stats.total}</Text>
+            <View style={[styles.chip, { backgroundColor: 'rgba(5, 150, 105, 0.15)' }]}>
+              <MaterialIcons name="trending-up" size={12} color="#059669" />
+              <Text style={[styles.chipText, { color: '#059669' }]}>{timeFilter}</Text>
+            </View>
+          </View>
+
+          {/* Present */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardLabel}>Present</Text>
+              <MaterialIcons name="check-circle" size={16} color="#059669" />
+            </View>
+            <Text style={[styles.cardValue, { color: '#059669' }]}>{stats.present}</Text>
+            <View style={[styles.chip, { backgroundColor: 'rgba(5, 150, 105, 0.15)' }]}>
+              <MaterialIcons name="trending-up" size={12} color="#059669" />
+              <Text style={[styles.chipText, { color: '#059669' }]}>Classes attended</Text>
+            </View>
+          </View>
+
+          {/* Absent */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardLabel}>Absent</Text>
+              <MaterialIcons name="cancel" size={16} color="#dc2626" />
+            </View>
+            <Text style={[styles.cardValue, { color: '#dc2626' }]}>{stats.absent}</Text>
+            <View style={[styles.chip, { backgroundColor: 'rgba(220, 38, 38, 0.15)' }]}>
+              <MaterialIcons name="trending-down" size={12} color="#dc2626" />
+              <Text style={[styles.chipText, { color: '#dc2626' }]}>Classes missed</Text>
+            </View>
+          </View>
+
+          {/* Att. Score */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardLabel}>Att. Score</Text>
+              <MaterialIcons name="timeline" size={16} color="#2563eb" />
+            </View>
+            <Text style={[styles.cardValue, { color: stats.percentage >= 75 ? '#059669' : '#dc2626' }]}>{stats.percentage}%</Text>
+            <View style={[styles.chip, { backgroundColor: stats.percentage >= 75 ? 'rgba(5, 150, 105, 0.15)' : 'rgba(220, 38, 38, 0.15)' }]}>
+              <MaterialIcons name={stats.percentage >= 75 ? "trending-up" : "trending-down"} size={12} color={stats.percentage >= 75 ? '#059669' : '#dc2626'} />
+              <Text style={[styles.chipText, { color: stats.percentage >= 75 ? '#059669' : '#dc2626' }]}>{stats.percentage >= 75 ? 'On Track' : 'At Risk'}</Text>
+            </View>
+          </View>
+        </View>
+      </AnimatedFadeIn>
+
+      <AnimatedFadeIn delay={150}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Subject Breakdown</Text>
+        </View>
+      </AnimatedFadeIn>
+    </>
+  );
+
+  const renderSubject = ({ item: sub, index }: { item: any, index: number }) => (
+    <AnimatedFadeIn delay={150 + (index * 40)}>
+      <TouchableOpacity onPress={() => setSelectedStat(sub)} style={styles.subjectCard}>
+        <View style={styles.subjectRow}>
+          <View style={[styles.subjectDot, { backgroundColor: sub.percentage >= 75 ? theme.colors.secondary : theme.colors.error }]} />
+          <View style={styles.subjectInfo}>
+            <Text style={styles.subjectName}>{sub.name}</Text>
+            <Text style={styles.subjectMeta}>{sub.attended}/{sub.total} classes</Text>
+          </View>
+          <View style={{ alignItems: 'flex-end', flexDirection: 'row', gap: 4 }}>
+            <Text style={styles.subjectPct}>{sub.percentage}%</Text>
+            <MaterialIcons name="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
+          </View>
+        </View>
+        <View style={styles.progressBarBg}>
+          <View style={[styles.progressBarFill, { 
+            width: `${Math.min(sub.percentage, 100)}%`,
+            backgroundColor: sub.percentage >= 75 ? theme.colors.secondary : theme.colors.error
+          }]} />
+        </View>
+      </TouchableOpacity>
+    </AnimatedFadeIn>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.pageTitle}>Statistics</Text>
-
-        {/* Overall Status Card — matches web app exactly */}
-        <View style={styles.overallCard}>
-          {/* Left: Ring */}
-          <View style={styles.ringWrapper}>
-            <Svg width={130} height={130} viewBox="0 0 130 130">
-              {/* Track */}
-              <Circle
-                cx="65" cy="65" r={RADIUS}
-                fill="transparent"
-                stroke={theme.colors.outlineVariant}
-                strokeWidth="12"
-                strokeLinecap="round"
-              />
-              {/* Fill */}
-              <Circle
-                cx="65" cy="65" r={RADIUS}
-                fill="transparent"
-                stroke={getStatusColor(overall.percentage)}
-                strokeWidth="12"
-                strokeLinecap="round"
-                strokeDasharray={CIRCUMFERENCE}
-                strokeDashoffset={dashOffset}
-                originX="65"
-                originY="65"
-                rotation="-90"
-              />
-            </Svg>
-            <View style={styles.ringCenter}>
-              <Text style={[styles.ringPct, { color: getStatusColor(overall.percentage) }]}>
-                {overall.percentage}%
-              </Text>
-              <Text style={styles.ringSub}>Overall</Text>
+      <FlatList
+        data={subjectStats}
+        keyExtractor={(item) => item.subject}
+        ListHeaderComponent={renderHeader()}
+        renderItem={renderSubject}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <AnimatedFadeIn delay={150}>
+            <View style={styles.subjectCard}>
+              <Text style={styles.emptyText}>No subject data available.</Text>
             </View>
-          </View>
+          </AnimatedFadeIn>
+        }
+      />
 
-          {/* Right: ATTENDED / MISSED / TOTAL stacked with dividers */}
-          <View style={styles.overallStats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statLabel}>ATTENDED</Text>
-              <Text style={styles.statValue}>{overall.attended}</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statLabel}>MISSED</Text>
-              <Text style={styles.statValue}>{overall.total - overall.attended}</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statLabel}>TOTAL</Text>
-              <Text style={styles.statValue}>{overall.total}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Subject Breakdown */}
-        <View style={styles.subjectsSection}>
-          <Text style={styles.sectionLabel}>Subject Breakdown</Text>
-          
-          {stats.map((stat, idx) => {
-            const statusColor = getStatusColor(stat.percentage);
-            return (
-              <TouchableOpacity
-                key={idx}
-                style={styles.subjectCard}
-                onPress={() => setSelectedStat(stat)}
-              >
-                <View style={styles.subjectRow}>
-                  <View style={[styles.subjectDot, { backgroundColor: statusColor }]} />
-                  <View style={styles.subjectInfo}>
-                    <Text style={styles.subjectName}>{stat.subjectName || stat.subject}</Text>
-                    <Text style={styles.subjectMeta}>
-                      {stat.subject !== stat.subjectName ? stat.subject + ' · ' : ''}
-                      {stat.attended}/{stat.total} classes · {stat.weeklyCount}/wk
-                    </Text>
-                  </View>
-                  <View style={styles.subjectRight}>
-                    <View style={[styles.pctBadge, { backgroundColor: statusColor + '1A' }]}>
-                      <Text style={[styles.pctBadgeText, { color: statusColor }]}>{stat.percentage}%</Text>
-                    </View>
-                    <MaterialIcons name="chevron-right" size={24} color={theme.colors.onSurfaceVariant} />
-                  </View>
-                </View>
-                <View style={styles.progressTrack}>
-                  <View
-                    style={[
-                      styles.progressFill,
-                      { width: `${Math.min(stat.percentage, 100)}%`, backgroundColor: statusColor }
-                    ]}
-                  />
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-
-          {stats.length === 0 && (
-            <View style={styles.emptyState}>
-              <MaterialIcons name="bar-chart" size={48} color={theme.colors.outlineVariant} />
-              <Text style={styles.emptyText}>No subjects yet.</Text>
-              <Text style={styles.emptySub}>Sync with Linways or add your timetable from Settings.</Text>
-            </View>
-          )}
-        </View>
-      </ScrollView>
-
-      {/* Subject Detail Modal */}
-      <Modal visible={!!selectedStat} animationType="slide" presentationStyle="pageSheet">
-        {selectedStat && (
-          <SubjectDetail 
-            stat={selectedStat} 
-            onClose={() => {
-              setSelectedStat(null);
-              loadData();
-            }} 
-          />
-        )}
+      <Modal visible={!!selectedStat} animationType="slide" onRequestClose={() => setSelectedStat(null)}>
+        {selectedStat && <SubjectDetail stat={selectedStat} onClose={() => setSelectedStat(null)} />}
       </Modal>
     </SafeAreaView>
   );
 }
 
 const makeStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingTop: 56,
-    paddingBottom: 40,
-  },
-  pageTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: theme.colors.onBackground,
-    marginBottom: 20,
-  },
+  container: { flex: 1, backgroundColor: theme.colors.background },
+  scrollContent: { padding: 24, paddingBottom: 100 },
+  pageTitle: { fontSize: 24, fontWeight: '700', color: theme.colors.onSurface, marginBottom: 20, fontFamily: 'Manrope-Bold' },
+  
+  filterRow: { flexDirection: 'row', gap: 12, marginBottom: 24 },
+  filterPill: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 24, borderWidth: 1, borderColor: theme.colors.outlineVariant, backgroundColor: theme.colors.surface },
+  filterPillText: { fontSize: 13, fontFamily: 'Manrope-Medium', color: theme.colors.onSurface },
 
-  // ── Overall card: horizontal layout matching the web app ──
-  overallCard: {
-    backgroundColor: theme.colors.surfaceContainerLowest,
-    borderRadius: 20,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 28,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 12,
-    elevation: 3,
-  },
-  ringWrapper: {
-    width: 130,
-    height: 130,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 20,
-    flexShrink: 0,
-  },
-  ringCenter: {
-    position: 'absolute',
-    alignItems: 'center',
-  },
-  ringPct: {
-    fontSize: 26,
-    fontWeight: '700',
-    lineHeight: 30,
-    color: theme.colors.onSurface,
-  },
-  ringSub: {
-    fontSize: 13,
-    color: theme.colors.onSurfaceVariant,
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  overallStats: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-  statItem: {
-    paddingVertical: 10,
-  },
-  statLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: theme.colors.onSurfaceVariant,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginBottom: 3,
-  },
-  statValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: theme.colors.onSurface,
-    lineHeight: 32,
-  },
-  statDivider: {
-    height: 1,
-    backgroundColor: theme.colors.outlineVariant,
-  },
+  cardsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 32 },
+  card: { width: '47%', backgroundColor: theme.colors.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: theme.colors.outlineVariant },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  cardLabel: { color: theme.colors.onSurfaceVariant, fontSize: 13, fontFamily: 'Manrope-Medium' },
+  cardValue: { fontSize: 28, fontFamily: 'Manrope-Bold', marginBottom: 16 },
+  
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, alignSelf: 'flex-start' },
+  chipText: { fontSize: 11, fontFamily: 'Manrope-SemiBold' },
 
-  // ── Subject cards ──
-  subjectsSection: {
-    marginTop: 4,
-  },
-  sectionLabel: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.colors.onBackground,
-    marginBottom: 14,
-  },
-  subjectCard: {
-    backgroundColor: theme.colors.surfaceContainerLowest,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 1,
-  },
-  subjectRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  subjectDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 12,
-  },
-  subjectInfo: {
-    flex: 1,
-  },
-  subjectName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.onSurface,
-    marginBottom: 2,
-  },
-  subjectMeta: {
-    fontSize: 12,
-    color: theme.colors.onSurfaceVariant,
-  },
-  subjectRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  pctBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  pctBadgeText: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  progressTrack: {
-    height: 5,
-    backgroundColor: theme.colors.surfaceContainer,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-    backgroundColor: theme.colors.surfaceContainerLowest,
-    borderRadius: 16,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.onSurface,
-    marginTop: 16,
-  },
-  emptySub: {
-    fontSize: 14,
-    color: theme.colors.onSurfaceVariant,
-    textAlign: 'center',
-    marginTop: 8,
-  },
+  sectionHeader: { marginBottom: 16 },
+  sectionTitle: { color: theme.colors.onSurface, fontSize: 16, fontWeight: '600', fontFamily: 'Manrope-SemiBold' },
+
+  emptyText: { textAlign: 'center', color: theme.colors.onSurfaceVariant, fontFamily: 'Manrope-Medium', fontSize: 13, paddingVertical: 12 },
+
+  subjectsSection: { marginTop: 4 },
+  subjectCard: { backgroundColor: theme.colors.surface, borderRadius: 16, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: theme.colors.outlineVariant },
+  subjectRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  subjectDot: { width: 10, height: 10, borderRadius: 5, marginRight: 12 },
+  subjectInfo: { flex: 1 },
+  subjectName: { fontSize: 15, fontWeight: '600', color: theme.colors.onSurface, fontFamily: 'Manrope-SemiBold' },
+  subjectMeta: { fontSize: 13, color: theme.colors.onSurfaceVariant, fontFamily: 'Manrope-Regular', marginTop: 2 },
+  subjectPct: { fontSize: 15, fontWeight: '700', color: theme.colors.onSurface, fontFamily: 'Manrope-Bold' },
+  progressBarBg: { height: 6, backgroundColor: theme.colors.surfaceContainerHigh, borderRadius: 3, overflow: 'hidden' },
+  progressBarFill: { height: '100%', borderRadius: 3 },
 });

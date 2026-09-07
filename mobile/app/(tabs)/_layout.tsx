@@ -1,11 +1,10 @@
 import { Tabs } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useColorScheme } from 'react-native';
-import { lightTheme, darkTheme } from '@/constants/theme';
+import { View, StyleSheet } from 'react-native';
+import { useThemeContext } from '../../context/ThemeContext';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const theme = colorScheme === 'dark' ? darkTheme : lightTheme;
+  const { theme } = useThemeContext();
 
   return (
     <Tabs
@@ -13,19 +12,29 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarStyle: {
-          backgroundColor: theme.colors.surfaceContainer,
-          borderTopWidth: 0,
-          elevation: 0, // Remove shadow on Android
-          height: 60,
-          paddingBottom: 8,
+          backgroundColor: theme.colors.surfaceContainerLowest,
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.surfaceContainerHigh,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.05,
+          shadowRadius: 16,
+          height: 70,
+          paddingBottom: 12,
           paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontFamily: 'Manrope-Medium',
+          fontSize: 11,
+          marginTop: 4,
         },
         headerStyle: {
           backgroundColor: theme.colors.surface,
         },
         headerTintColor: theme.colors.onSurface,
         headerTitleStyle: {
-          fontFamily: 'sans-serif-medium', // Match Manrope roughly for now
+          fontFamily: 'Manrope-SemiBold',
         },
       }}>
       <Tabs.Screen
@@ -33,23 +42,23 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialIcons name="home" size={28} color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="home" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
-          title: 'Stats',
+          title: 'Analytics',
           headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialIcons name="bar-chart" size={28} color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="bar-chart" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
         name="calendar"
         options={{
-          title: 'Calendar',
+          title: 'Attendance',
           headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialIcons name="calendar-today" size={28} color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="calendar-today" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -57,9 +66,25 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialIcons name="settings" size={28} color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="settings" size={26} color={color} />,
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  centerButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  }
+});

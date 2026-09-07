@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 export const STORAGE_KEYS = {
   TIMETABLE: 'attendance_timetable',
@@ -12,6 +13,7 @@ export const STORAGE_KEYS = {
   NOTIFIED_VERSION: 'app_notified_version',
   THEME: 'attendance_theme',
   LINWAYS_CONFIG: 'linways_sync_config',
+  EXACT_TIMETABLE: 'attendance_exact_timetable',
 };
 
 const getArray = async (key: string) => {
@@ -49,6 +51,15 @@ export const storage = {
     });
 
     await storage.saveTimetable(merged);
+  },
+
+  getExactTimetable: () => getObj(STORAGE_KEYS.EXACT_TIMETABLE),
+  saveExactTimetable: (data: any) => setVal(STORAGE_KEYS.EXACT_TIMETABLE, data),
+  
+  importExactTimetableData: async (dateClassMap: Record<string, any[]>) => {
+    const current = (await storage.getExactTimetable()) || {};
+    const merged = { ...current, ...dateClassMap };
+    await storage.saveExactTimetable(merged);
   },
 
   // Records
@@ -90,7 +101,7 @@ export const storage = {
     const date = await AsyncStorage.getItem(STORAGE_KEYS.START_DATE);
     if (!date) {
       const d = new Date();
-      d.setDate(d.getDate() - 14);
+      d.setDate(d.getDate() - 120);
       return d.toISOString().split('T')[0];
     }
     return date.replace(/"/g, '');
@@ -124,16 +135,26 @@ export const storage = {
 
   // Linways Portal Sync Config (Using SecureStore!)
   getLinwaysConfig: async () => {
+    if (Platform.OS === 'web') {
+      const val = await AsyncStorage.getItem(STORAGE_KEYS.LINWAYS_CONFIG);
+      return val ? JSON.parse(val) : null;
+    }
     const val = await SecureStore.getItemAsync(STORAGE_KEYS.LINWAYS_CONFIG);
     return val ? JSON.parse(val) : null;
   },
   saveLinwaysConfig: async (data: any) => {
+    if (Platform.OS === 'web') {
+      await AsyncStorage.setItem(STORAGE_KEYS.LINWAYS_CONFIG, JSON.stringify(data));
+      return;
+    }
     await SecureStore.setItemAsync(STORAGE_KEYS.LINWAYS_CONFIG, JSON.stringify(data));
   },
 
   // Clear all
   clearAll: async () => {
     await AsyncStorage.clear();
-    await SecureStore.deleteItemAsync(STORAGE_KEYS.LINWAYS_CONFIG);
+    if (Platform.OS !== 'web') {
+      await SecureStore.deleteItemAsync(STORAGE_KEYS.LINWAYS_CONFIG);
+    }
   }
 };

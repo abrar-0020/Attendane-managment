@@ -45,7 +45,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
   );
 }
 
-const makeStyles = (theme: any) => StyleSheet.create({
+const styles = StyleSheet.create({
   getStartedContainer: {
     alignItems: 'center',
     marginHorizontal: 50,

@@ -17,7 +17,7 @@ export default function ModalScreen() {
   );
 }
 
-const makeStyles = (theme: any) => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',

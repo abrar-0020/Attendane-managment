@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, TextInput, SafeAreaView, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { Text } from '@/components/Text';
 import { MaterialIcons } from '@expo/vector-icons';
 import { parseTimetableText } from '../../utils/timetableParser';
@@ -34,7 +35,10 @@ export default function ImportTextModal() {
   const handleImport = async () => {
     if (!parsedData || parsedData.entries.length === 0) return;
     
-    await storage.importTimetableData(parsedData.entries, parsedData.profile);
+    await storage.importTimetableData(parsedData.entries);
+    if (parsedData.profile) {
+      await storage.saveProfile(parsedData.profile);
+    }
     
     Alert.alert("Success", `Successfully imported ${parsedData.entries.length} classes!`, [
       { text: "OK", onPress: () => router.back() }

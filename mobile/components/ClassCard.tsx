@@ -3,10 +3,24 @@ import { View, StyleSheet, TouchableOpacity, LayoutAnimation } from 'react-nativ
 import { Text } from '@/components/Text';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useThemeContext } from '../context/ThemeContext';
+import { LinearGradient } from '@/components/LinearGradient';
 
-export default function ClassCard({ cls, status, edgeColor, onUpdateStatus }: any) {
+const STATUS_LABELS: any = {
+  present: 'Present',
+  absent: 'Absent',
+  unmarked: 'Unmarked',
+  cancelled: 'Cancelled',
+};
+
+const STATUS_COLORS: any = {
+  present: '#86efac', // light green
+  absent: '#fca5a5', // light red
+  unmarked: 'rgba(255,255,255,0.8)',
+  cancelled: '#fca5a5',
+};
+
+export default function ClassCard({ cls, status, onUpdateStatus }: any) {
   const { theme } = useThemeContext();
-  const styles = makeStyles(theme);
   const [showMenu, setShowMenu] = useState(false);
 
   const toggleMenu = () => {
@@ -20,72 +34,83 @@ export default function ClassCard({ cls, status, edgeColor, onUpdateStatus }: an
   };
 
   const isCancelled = status === 'cancelled';
+  const statusColor = STATUS_COLORS[status] || 'white';
   
-  let edgeColorValue = theme.colors.primary;
-  if (edgeColor === 'secondary') edgeColorValue = theme.colors.secondary;
-  if (edgeColor === 'error' || isCancelled) edgeColorValue = theme.colors.error;
+  const styles = makeStyles(theme);
 
   return (
-    <View style={[styles.card, isCancelled && styles.cardCancelled]}>
-      <View style={[styles.edge, { backgroundColor: edgeColorValue }]} />
-      
-      <View style={styles.body}>
-        <View style={styles.header}>
-          <Text style={[styles.subjectName, isCancelled && styles.textLineThrough]}>
-            {cls.subjectName || cls.subject}
-          </Text>
-          {isCancelled && (
-            <View style={styles.cancelledPill}>
-              <Text style={styles.cancelledPillText}>Cancelled</Text>
+    <View style={[styles.cardContainer, isCancelled && styles.cardCancelled]}>
+      <TouchableOpacity activeOpacity={0.9} onPress={toggleMenu}>
+        <LinearGradient
+          colors={[theme.colors.primary, theme.colors.primaryDark]}
+          style={styles.cardGradient}
+        >
+          {/* Left Column */}
+          <View style={styles.leftCol}>
+            <View style={styles.leftBox}>
+              <Text style={styles.leftBoxBig}>{String(cls.hour).padStart(2, '0')}</Text>
+              <Text style={styles.leftBoxSmall}>Hour</Text>
             </View>
-          )}
-        </View>
-        
-        <View style={styles.metaRow}>
-          <View style={styles.metaItem}>
-            <MaterialIcons name="schedule" size={16} color={theme.colors.onSurfaceVariant} />
-            <Text style={[styles.metaText, isCancelled && styles.textLineThrough]}>
-              {cls.starttime && cls.endtime ? `${cls.starttime} - ${cls.endtime}` : `Hr ${cls.hour}`}
-            </Text>
+            <View style={styles.roomRow}>
+              <MaterialIcons name="meeting-room" size={12} color="rgba(255,255,255,0.7)" />
+              <Text style={[styles.roomText, isCancelled && styles.textLineThrough]} numberOfLines={1}>
+                {cls.room || 'TBA'}
+              </Text>
+            </View>
           </View>
-          <Text style={styles.metaDot}>•</Text>
-          <View style={styles.metaItem}>
-            <MaterialIcons name="meeting-room" size={16} color={theme.colors.onSurfaceVariant} />
-            <Text style={[styles.metaText, isCancelled && styles.textLineThrough]}>
-              {cls.room || 'TBA'}
+          
+          {/* Right Content */}
+          <View style={styles.rightContent}>
+            <Text style={[styles.subjectName, isCancelled && styles.textLineThrough]} numberOfLines={2}>
+              {cls.subjectName || cls.subject}
             </Text>
+            
+            <View style={styles.statsRow}>
+              <View style={styles.statCol}>
+                <Text style={styles.statLabel}>Start</Text>
+                <Text style={[styles.statValue, isCancelled && styles.textLineThrough]}>
+                  {cls.starttime || '-'}
+                </Text>
+              </View>
+              <View style={styles.statCol}>
+                <Text style={styles.statLabel}>End</Text>
+                <Text style={[styles.statValue, isCancelled && styles.textLineThrough]}>
+                  {cls.endtime || '-'}
+                </Text>
+              </View>
+              <View style={styles.statCol}>
+                <Text style={styles.statLabel}>Status</Text>
+                <Text style={[styles.statValue, { color: statusColor }]}>
+                  {STATUS_LABELS[status]}
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
+        </LinearGradient>
+      </TouchableOpacity>
 
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.menuBtn} onPress={toggleMenu}>
-          <MaterialIcons name={showMenu ? "expand-less" : "more-vert"} size={24} color={theme.colors.onSurfaceVariant} />
-        </TouchableOpacity>
-      </View>
-
+      {/* Action Menu (Expands downwards) */}
       {showMenu && (
         <View style={styles.menuArea}>
-          <View style={styles.divider} />
           <View style={styles.menuButtons}>
             <TouchableOpacity style={styles.menuOption} onPress={() => handleUpdate('present')}>
-              <MaterialIcons name="check" size={20} color={status === 'present' ? theme.colors.secondary : theme.colors.onSurfaceVariant} />
-              <Text style={[styles.menuOptionText, status === 'present' && { color: theme.colors.secondary }]}>Present</Text>
+              <MaterialIcons name="check" size={20} color={theme.colors.secondary} />
+              <Text style={[styles.menuOptionText, { color: theme.colors.secondary }]}>Present</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuOption} onPress={() => handleUpdate('absent')}>
-              <MaterialIcons name="close" size={20} color={status === 'absent' ? theme.colors.error : theme.colors.onSurfaceVariant} />
-              <Text style={[styles.menuOptionText, status === 'absent' && { color: theme.colors.error }]}>Absent</Text>
+              <MaterialIcons name="close" size={20} color={theme.colors.error} />
+              <Text style={[styles.menuOptionText, { color: theme.colors.error }]}>Absent</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuOption} onPress={() => handleUpdate('unmarked')}>
-              <MaterialIcons name="undo" size={20} color={status === 'unmarked' ? theme.colors.outline : theme.colors.onSurfaceVariant} />
-              <Text style={[styles.menuOptionText, status === 'unmarked' && { color: theme.colors.outline }]}>Reset</Text>
+              <MaterialIcons name="undo" size={20} color={theme.colors.onSurfaceVariant} />
+              <Text style={[styles.menuOptionText, { color: theme.colors.onSurfaceVariant }]}>Reset</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuOption} onPress={() => handleUpdate('cancelled')}>
-              <MaterialIcons name="block" size={20} color={status === 'cancelled' ? theme.colors.error : theme.colors.onSurfaceVariant} />
-              <Text style={[styles.menuOptionText, status === 'cancelled' && { color: theme.colors.error }]}>Cancel Class</Text>
+              <MaterialIcons name="block" size={20} color={theme.colors.error} />
+              <Text style={[styles.menuOptionText, { color: theme.colors.error }]}>Cancel Class</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -95,93 +120,91 @@ export default function ClassCard({ cls, status, edgeColor, onUpdateStatus }: an
 }
 
 const makeStyles = (theme: any) => StyleSheet.create({
-  card: {
-    backgroundColor: theme.colors.surfaceContainerLowest,
-    borderRadius: 16,
+  cardContainer: {
     marginBottom: 12,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderRadius: 16,
     overflow: 'hidden',
   },
   cardCancelled: {
     opacity: 0.6,
   },
-  edge: {
-    width: 6,
-    height: '100%',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-  },
-  body: {
-    flex: 1,
+  cardGradient: {
+    flexDirection: 'row',
     padding: 16,
-    paddingLeft: 20,
+    alignItems: 'center',
   },
-  header: {
+  leftCol: {
+    alignItems: 'center',
+    marginRight: 16,
+    width: 60,
+  },
+  leftBox: {
+    width: 60,
+    height: 60,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  leftBoxBig: {
+    fontSize: 22,
+    fontFamily: 'Manrope-Bold',
+    color: 'white',
+    marginBottom: -4,
+  },
+  leftBoxSmall: {
+    fontSize: 11,
+    fontFamily: 'Manrope-Medium',
+    color: 'rgba(255,255,255,0.8)',
+  },
+  roomRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginTop: 6,
+    gap: 4,
+  },
+  roomText: {
+    fontSize: 11,
+    fontFamily: 'Manrope-Medium',
+    color: 'rgba(255,255,255,0.8)',
+  },
+  rightContent: {
+    flex: 1,
+    justifyContent: 'center',
   },
   subjectName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.colors.onSurface,
+    fontSize: 16,
+    fontFamily: 'Manrope-Bold',
+    color: 'white',
+    marginBottom: 10,
+    lineHeight: 22,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  statCol: {
+    flex: 1,
+  },
+  statLabel: {
+    fontSize: 11,
+    fontFamily: 'Manrope-Regular',
+    color: 'rgba(255,255,255,0.7)',
+    marginBottom: 2,
+  },
+  statValue: {
+    fontSize: 13,
+    fontFamily: 'Manrope-Medium',
+    color: 'white',
   },
   textLineThrough: {
     textDecorationLine: 'line-through',
-    color: theme.colors.onSurfaceVariant,
-  },
-  cancelledPill: {
-    marginLeft: 12,
-    backgroundColor: theme.colors.errorContainer,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  cancelledPillText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: theme.colors.error,
-    textTransform: 'uppercase',
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metaText: {
-    fontSize: 14,
-    color: theme.colors.onSurfaceVariant,
-  },
-  metaDot: {
-    marginHorizontal: 8,
-    color: theme.colors.onSurfaceVariant,
-  },
-  actions: {
-    padding: 16,
-    justifyContent: 'flex-start',
-  },
-  menuBtn: {
-    padding: 4,
+    color: 'rgba(255,255,255,0.6)',
   },
   menuArea: {
-    width: '100%',
-    backgroundColor: theme.colors.surfaceContainerLow,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: theme.colors.surfaceContainerHighest,
+    backgroundColor: theme.colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.surfaceContainerHighest,
   },
   menuButtons: {
     flexDirection: 'row',
@@ -194,7 +217,6 @@ const makeStyles = (theme: any) => StyleSheet.create({
   },
   menuOptionText: {
     fontSize: 12,
-    fontWeight: '500',
-    color: theme.colors.onSurfaceVariant,
+    fontFamily: 'Manrope-Medium',
   },
 });

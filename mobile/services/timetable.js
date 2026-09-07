@@ -11,6 +11,13 @@ export const timetableService = {
       return [];
     }
     
+    const exactTimetable = (await storage.getExactTimetable()) || {};
+    // Use 'in' check instead of truthiness: an empty array [] means
+    // Linways confirmed no classes that day — don't fall back to recurring.
+    if (dateString in exactTimetable) {
+      return (exactTimetable[dateString] || []).sort((a, b) => a.hour - b.hour);
+    }
+    
     const allClasses = await storage.getTimetable();
     
     // Filter by day of week and if the class has started (class.startDate <= dateString)
