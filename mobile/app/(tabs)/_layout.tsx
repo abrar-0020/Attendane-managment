@@ -1,16 +1,23 @@
-import { Tabs } from 'expo-router';
+import { TopTabs as SwipeTabs } from 'expo-router/js-top-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import { View, StyleSheet } from 'react-native';
 import { useThemeContext } from '../../context/ThemeContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { theme } = useThemeContext();
+  const insets = useSafeAreaInsets();
 
   return (
-    <Tabs
+    <SwipeTabs
+      tabBarPosition="bottom"
       screenOptions={{
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
+        swipeEnabled: true,
+        tabBarIndicatorStyle: {
+          height: 0, // Hide the indicator line to mimic bottom tabs
+        },
         tabBarStyle: {
           backgroundColor: theme.colors.surfaceContainerLowest,
           borderTopWidth: 1,
@@ -20,56 +27,46 @@ export default function TabLayout() {
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.05,
           shadowRadius: 16,
-          height: 70,
-          paddingBottom: 12,
+          height: 70 + insets.bottom,
+          paddingBottom: 12 + insets.bottom,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontFamily: 'Manrope-Medium',
           fontSize: 11,
           marginTop: 4,
-        },
-        headerStyle: {
-          backgroundColor: theme.colors.surface,
-        },
-        headerTintColor: theme.colors.onSurface,
-        headerTitleStyle: {
-          fontFamily: 'Manrope-SemiBold',
+          textTransform: 'none',
         },
       }}>
-      <Tabs.Screen
+      <SwipeTabs.Screen
         name="index"
         options={{
           title: 'Home',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialIcons name="home" size={26} color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <MaterialIcons name="home" size={26} color={color} />,
         }}
       />
-      <Tabs.Screen
+      <SwipeTabs.Screen
         name="stats"
         options={{
           title: 'Analytics',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialIcons name="bar-chart" size={26} color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <MaterialIcons name="bar-chart" size={26} color={color} />,
         }}
       />
-      <Tabs.Screen
+      <SwipeTabs.Screen
         name="calendar"
         options={{
           title: 'Attendance',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialIcons name="calendar-today" size={26} color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <MaterialIcons name="calendar-today" size={26} color={color} />,
         }}
       />
-      <Tabs.Screen
+      <SwipeTabs.Screen
         name="settings"
         options={{
           title: 'Settings',
-          headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialIcons name="settings" size={26} color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <MaterialIcons name="settings" size={26} color={color} />,
         }}
       />
-    </Tabs>
+    </SwipeTabs>
   );
 }
 

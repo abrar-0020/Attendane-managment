@@ -72,28 +72,37 @@ export const notificationService = {
       }
     }
 
-    const todayStr = dateUtils.formatDate(new Date());
-    const todayClasses = await timetableService.getClassesForDate(todayStr);
+    const timetable = await storage.getTimetable();
+    if (!timetable || timetable.length === 0) return;
 
-    if (!todayClasses || todayClasses.length === 0) return;
+    const daysMap: Record<string, number> = {
+      'Sunday': 1,
+      'Monday': 2,
+      'Tuesday': 3,
+      'Wednesday': 4,
+      'Thursday': 5,
+      'Friday': 6,
+      'Saturday': 7
+    };
 
-    const now = new Date();
     let scheduledCount = 0;
 
-    for (const cls of todayClasses) {
-      if (!cls.starttime) continue;
+    for (const cls of timetable) {
+      if (!cls.starttime || !cls.day || !daysMap[cls.day]) continue;
 
       const [hourStr, minStr] = cls.starttime.split(':');
-      const classHour = parseInt(hourStr, 10);
-      const classMin = parseInt(minStr || '0', 10);
+      let triggerHour = parseInt(hourStr, 10);
+      let triggerMin = parseInt(minStr || '0', 10);
 
-      const classTime = new Date();
-      classTime.setHours(classHour, classMin, 0, 0);
-
-      const triggerTime = new Date(classTime.getTime() - reminderMinutes * 60 * 1000);
-
-      // Only schedule if still in the future
-      if (triggerTime.getTime() - now.getTime() < 30000) continue;
+      // Subtract reminderMinutes
+      triggerMin -= reminderMinutes;
+      while (triggerMin < 0) {
+        triggerMin += 60;
+        triggerHour -= 1;
+      }
+      if (triggerHour < 0) {
+        triggerHour += 24;
+      }
 
       await Notifications.scheduleNotificationAsync({
         content: {
@@ -103,50 +112,27 @@ export const notificationService = {
           data: { type: 'class-reminder', subject: cls.subject },
         },
         trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.DATE,
-          date: triggerTime,
+          weekday: daysMap[cls.day],
+          hour: triggerHour,
+          minute: triggerMin,
+          repeats: true,
         },
       });
       scheduledCount++;
     }
 
-    console.log(`[Notifications] Scheduled ${scheduledCount} class reminder(s) for today`);
+    console.log(`[Notifications] Scheduled ${scheduledCount} weekly class reminder(s)`);
   },
 
-  /**
-   * Fire an immediate local notification when attendance is marked.
-   * @param subject  Subject/course name
-   * @param status   'present' | 'absent'
-   * @param date     Date string e.g. '2026-09-05'
-   */
   async notifyAttendanceMarked(subject: string, status: 'present' | 'absent', date?: string) {
-    if (!Notifications) return;
-    const granted = await this.requestPermissions();
-    if (!granted) return;
-
     const isPresent = status === 'present';
-    const emoji = isPresent ? '✅' : '❌';
-    const title = isPresent
-      ? `${emoji} Marked Present`
-      : `${emoji} Marked Absent`;
     const body = isPresent
       ? `You've been marked present for ${subject}.`
-      : `You've been marked absent for ${subject}. Keep an eye on your attendance!`;
+      : `You've been marked absent for ${subject}.`;
 
     if (Platform.OS === 'android') {
       ToastAndroid.show(body, ToastAndroid.SHORT);
     }
-
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title,
-        body,
-        sound: true,
-        data: { type: 'attendance-mark', subject, status, date },
-        ...(Platform.OS === 'android' && { channelId: 'attendance-marks' }),
-      },
-      trigger: null, // null means fire immediately
-    });
   },
 
   async cancelAll() {

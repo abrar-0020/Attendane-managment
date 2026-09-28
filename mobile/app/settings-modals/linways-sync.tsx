@@ -65,6 +65,10 @@ export default function LinwaysSyncModal() {
         setImportedCount(result.imported || 0);
         setLastSynced('Just now');
         setStep('success');
+        // Temporary diagnostic alert — remove after debugging
+        if ((result as any).debug) {
+          setTimeout(() => Alert.alert("Sync Debug", (result as any).debug), 500);
+        }
       } else {
         Alert.alert("Sync Failed", result.error || 'Unknown error.');
         setStep('form');
@@ -83,7 +87,18 @@ export default function LinwaysSyncModal() {
          { text: "Cancel", style: "cancel" },
          { text: "Remove", style: "destructive", onPress: async () => {
             await linwaysSync.clearConfig();
-            router.back();
+            
+            // Clear local data immediately on logout
+            await storage.saveTimetable([]);
+            await storage.saveExactTimetable({});
+            await storage.saveRecords([]);
+            await storage.saveBaseCounts({});
+            
+            // Clear form state and stay on the login screen
+            setUsername('');
+            setPassword('');
+            setLastSynced('');
+            setImportedCount(0);
          }}
       ]
     );

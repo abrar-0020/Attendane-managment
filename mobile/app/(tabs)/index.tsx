@@ -111,7 +111,15 @@ export default function HomeView() {
     const timetable = await storage.getTimetable();
     const records = await storage.getRecords();
     const baseCounts = await storage.getBaseCounts();
-    const subjects = [...new Set(timetable.map((t: any) => t.subject))];
+    
+    let subjects = [...new Set(timetable.map((t: any) => t.subject))].filter(Boolean);
+    const recordSubjects = [...new Set(records.map((r: any) => r.subject))].filter(Boolean);
+    
+    recordSubjects.forEach(rs => {
+      if (!subjects.includes(rs)) {
+        subjects.push(rs);
+      }
+    });
 
     let totalAttended = 0;
     let totalClasses = 0;
