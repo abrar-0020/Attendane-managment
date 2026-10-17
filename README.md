@@ -10,9 +10,9 @@ Built using React Native, Expo SDK 57, and Expo Router, AttendMe provides an int
 
 The latest Android version is available through the GitHub Releases page.
 
-**Current Release:** v2.0.0
+**Current Release:** v2.1.1
 
-Download the `AttendMe-v2.0.0.apk` file from the **Assets** section of the v2.0.0 release and install it directly on your Android device.
+Download the `AttendMe-v2.1.1.apk` file from the **Assets** section of the v2.1.1 release and install it directly on your Android device.
 
 [View Releases](../../releases)
 
