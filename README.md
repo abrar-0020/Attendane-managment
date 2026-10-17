@@ -203,7 +203,7 @@ If you only want to use AttendMe, you do not need to install the development env
 
 For the latest version, download:
 
-**`AttendMe-v2.0.0.apk`**
+**`AttendMe-v2.1.1.apk`**
 
 ---
 
@@ -211,6 +211,7 @@ For the latest version, download:
 
 AttendMe maintains separate GitHub Releases for different versions of the application. Each release contains its corresponding release notes and downloadable APK when available.
 
+- **v2.1.1** — Bugs fixes and improved performance 
 - **v2.0.0** — Current mobile release with native Android features, widgets, background synchronization, notifications, offline-first storage, and redesigned mobile UI.
 - **v1.5.0** — Previous mobile release.
 - **v1.0.0** — Initial web-based release.
